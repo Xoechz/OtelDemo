@@ -21,6 +21,10 @@ public static class ServiceCollectionExtensions
     /// <param name="configuration"><see cref="IConfiguration"/></param>
     /// <param name="environment"><see cref="IHostEnvironment"/></param>
     /// <returns><see cref="IServiceCollection"/> for method chaining</returns>
+    /// <remarks>
+    /// I wasn't really happy with the way the normal hangfire instrumentation works, so I created this custom instrumentation.
+    /// The main benefit is it emitting a special event for failed jobs after all retries.
+    /// </remarks>
     public static IServiceCollection ConfigureOpenTelemetryWithHangfire(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         services.ConfigureOpenTelemetry(configuration, environment, out var activitySource);

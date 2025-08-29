@@ -95,7 +95,7 @@ public static class ServiceCollectionExtension
     }
 
     /// <summary>
-    /// The swietelsky way for OpenTelemetry configuration.
+    /// My way of OpenTelemetry configuration.
     /// </summary>
     /// <param name="services"><see cref="IServiceCollection"/></param>
     /// <param name="configuration"><see cref="IConfiguration"/></param>
@@ -105,7 +105,7 @@ public static class ServiceCollectionExtension
         => ConfigureOpenTelemetry(services, configuration, environment, out _);
 
     /// <summary>
-    /// The swietelsky way for OpenTelemetry configuration. Outputs the <see cref="ActivitySource"/> Singleton that the application uses.
+    /// My way of  OpenTelemetry configuration. Outputs the <see cref="ActivitySource"/> Singleton that the application uses.
     /// </summary>
     /// <param name="services"><see cref="IServiceCollection"/></param>
     /// <param name="configuration"><see cref="IConfiguration"/></param>
