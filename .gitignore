@@ -849,3 +849,5 @@ TSWLatexianTemp*
 # Uncomment the next line to have this generated file ignored.
 #*Notes.bib
 builder-output/
+
+appsettings.development.json
