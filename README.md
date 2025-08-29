@@ -1,2 +1,3 @@
-# OtelDemo
-A Demo to show of OpenTelemetry and https://github.com/Xoechz/DITO
+# Xoechz/OtelDemo
+
+A demo to show of OpenTelemetry and [DITO](https://github.com/Xoechz/DITO)
