@@ -16,6 +16,13 @@ namespace Demo.OpenTelemetry.Extensions;
 /// </summary>
 public static class ServiceCollectionExtension
 {
+    #region Private Members
+
+    private const string OTEL_CONFIG = "OTEL_EXPORTER_OTLP_ENDPOINT";
+    private const string APP_INSIGHTS_CONFIG = "APPLICATIONINSIGHTS_CONNECTION_STRING";
+
+    #endregion Private Members
+
     #region Public Methods
 
     public static IServiceCollection ConfigureApplicationInsights(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
@@ -24,13 +31,13 @@ public static class ServiceCollectionExtension
         SetupActivitySource(services, serviceName);
 
         // Check if the Azure Monitor is configured via environment variables.
-        var useAzureMonitor = !string.IsNullOrWhiteSpace(configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+        var useAzureMonitor = !string.IsNullOrWhiteSpace(configuration[APP_INSIGHTS_CONFIG]);
 
         if (useAzureMonitor)
         {
             services.AddApplicationInsightsTelemetry(options =>
             {
-                options.ConnectionString = configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+                options.ConnectionString = configuration[APP_INSIGHTS_CONFIG];
             });
         }
 
@@ -66,8 +73,8 @@ public static class ServiceCollectionExtension
             });
 
         // Check if the OTLP exporter or Azure Monitor is configured via environment variables.
-        var useOtlpExporter = !string.IsNullOrWhiteSpace(configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
-        var useAzureMonitor = !string.IsNullOrWhiteSpace(configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+        var useOtlpExporter = !string.IsNullOrWhiteSpace(configuration[OTEL_CONFIG]);
+        var useAzureMonitor = !string.IsNullOrWhiteSpace(configuration[APP_INSIGHTS_CONFIG]);
 
         if (useOtlpExporter)
         {
@@ -155,8 +162,8 @@ public static class ServiceCollectionExtension
             });
 
         // Check if the OTLP exporter or Azure Monitor is configured via environment variables.
-        var useOtlpExporter = !string.IsNullOrWhiteSpace(configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
-        var useAzureMonitor = !string.IsNullOrWhiteSpace(configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+        var useOtlpExporter = !string.IsNullOrWhiteSpace(configuration[OTEL_CONFIG]);
+        var useAzureMonitor = !string.IsNullOrWhiteSpace(configuration[APP_INSIGHTS_CONFIG]);
 
         if (useOtlpExporter)
         {
