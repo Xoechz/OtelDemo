@@ -146,11 +146,9 @@ public static class ServiceCollectionExtension
                 // AspNetCoreInstrumentation adds tracing for ASP.NET Core operations, such as HTTP requests, middleware, etc.
                     .AddAspNetCoreInstrumentation(o =>
                         {
-                            // Exclude Hangfire requests and 401 responses from tracing.
+                            // Exclude Hangfire requests from tracing.
                             // Hangfire requests are made from the Hangfire dashboard and do not need to be traced.
-                            // Most 401 responses are caused by NTLM authentication, which is not relevant for tracing.
-                            o.Filter = context => !context.Request.Path.ToString().Contains("hangfire")
-                                && context.Response.StatusCode != 401;
+                            o.Filter = context => !context.Request.Path.ToString().Contains("hangfire");
                         })
                     // EntityFrameworkCoreInstrumentation adds tracing for Entity Framework Core operations, such as database queries and commands.
                     // Node: The SqlClientInstrumentation is not included, because we do not really use raw SQL commands, but hangfire uses them fairly often, which is not relevant.
