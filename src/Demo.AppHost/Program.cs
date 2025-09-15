@@ -26,7 +26,6 @@ foreach (var serviceIndex in services)
         .WithEnvironment("CRON_EXPRESSION", "*/" + (serviceIndex + 1) + " * * * *")
         //.WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
         .WithHttpEndpoint(5280 + serviceIndex)
-        .WithHttpsEndpoint(7160 + serviceIndex)
         .WithReference(demoDb)
         .WaitForCompletion(migration);
 }
