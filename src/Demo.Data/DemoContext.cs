@@ -7,7 +7,7 @@ public class DemoContext(DbContextOptions<DemoContext> options) : DbContext(opti
 {
     #region Public Properties
 
-    public DbSet<User> Users { get; set; }
+    public DbSet<User> Users => Set<User>();
 
     #endregion Public Properties
 }
