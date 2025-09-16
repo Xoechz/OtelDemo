@@ -3,6 +3,7 @@ using Demo.Data.Models;
 using Demo.Data.Repositories;
 using Demo.JobService.Config;
 using Demo.JobService.Jobs;
+using Demo.OpenTelemetry.Extensions;
 using Demo.ServiceDefaults;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-#pragma warning disable S125 // Sections of code should not be commented out
-//builder.Services.ConfigureApplicationInsights(builder.Configuration, builder.Environment);
-#pragma warning restore S125 // Sections of code should not be commented out
+builder.Services.ConfigureApplicationInsights(builder.Configuration, builder.Environment);
 
 var serviceIndex = builder.Configuration["SERVICE_INDEX"]
     ?? throw new InvalidOperationException();

@@ -2,6 +2,7 @@ using Demo.Data;
 using Demo.MigrationService;
 using Demo.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.AddServiceDefaults();
@@ -15,10 +16,8 @@ var connectionString = builder.Configuration.GetConnectionString("DB-" + service
 
 builder.Services.AddDbContext<DemoContext>(options => options.UseSqlServer(connectionString));
 
-#pragma warning disable S125 // Sections of code should not be commented out
-//var activitySource = new ActivitySource("placeholder");
-//builder.Services.AddSingleton(activitySource);
-#pragma warning restore S125 // Sections of code should not be commented out
+var activitySource = new ActivitySource("placeholder");
+builder.Services.AddSingleton(activitySource);
 
 var host = builder.Build();
 await host.RunAsync();
