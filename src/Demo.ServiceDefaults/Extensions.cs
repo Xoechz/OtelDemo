@@ -1,4 +1,4 @@
-using Demo.OpenTelemetry.Jobs.Extensions;
+using Demo.OpenTelemetry.Extensions;
 using Demo.ServiceDefaults.Faker;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -30,10 +30,7 @@ public static class Extensions
 
         builder.Services.AddServiceDiscovery();
 
-#pragma warning disable S125 // Sections of code should not be commented out
-        //builder.Services.ConfigureBasicOpenTelemetry(builder.Configuration, builder.Environment);
-        builder.Services.ConfigureOpenTelemetryWithHangfire(builder.Configuration, builder.Environment);
-#pragma warning restore S125 // Sections of code should not be commented out
+        builder.Services.ConfigureBasicOpenTelemetry(builder.Configuration, builder.Environment);
 
         builder.Services.ConfigureHttpClientDefaults(http =>
         {
