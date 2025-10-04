@@ -5,7 +5,7 @@ var sql = builder.AddSqlServer("sql")
     .WithDataVolume();
 
 var services = Enumerable.Range(0, 3);
-var urls = string.Join(",", services.Select(i => "http://127.0.0.1:" + (5280 + i)));
+var urls = string.Join(",", services.Select(i => "https://127.0.0.1:" + (5280 + i)));
 
 foreach (var serviceIndex in services)
 {
@@ -25,7 +25,6 @@ foreach (var serviceIndex in services)
         .WithEnvironment("TARGET_URLS", urls)
         .WithEnvironment("CRON_EXPRESSION", "*/" + (serviceIndex + 1) + " * * * *")
         //.WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
-        .WithHttpEndpoint(5280 + serviceIndex)
         .WithReference(demoDb)
         .WaitForCompletion(migration);
 }

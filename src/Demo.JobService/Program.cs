@@ -5,7 +5,9 @@ using Demo.JobService.Config;
 using Demo.JobService.Jobs;
 using Demo.ServiceDefaults;
 using Hangfire;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,31 @@ var connectionString = builder.Configuration.GetConnectionString("DB-" + service
     ?? throw new InvalidOperationException("Connection String DB-" + serviceIndex + " is not configured.");
 
 builder.Services.AddDbContext<DemoContext>(options => options.UseSqlServer(connectionString));
+
+if (!int.TryParse(serviceIndex, out var serviceIndexValue))
+{
+    throw new InvalidOperationException("SERVICE_INDEX is not a valid integer.");
+}
+
+// Enable HTTP/3 (alongside HTTP/1.1 & HTTP/2) on the chosen port
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5280 + serviceIndexValue, lo =>
+    {
+        lo.UseHttps();
+        lo.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+    });
+});
+
+builder.Services.AddHttpClient("jobs", client =>
+{
+    client.DefaultRequestVersion = HttpVersion.Version30;
+    client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+    AutomaticDecompression = DecompressionMethods.All,
+});
 
 builder.Services.AddHangfireServer()
     .AddSingleton<RecurringJobScheduler>()

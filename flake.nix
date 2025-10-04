@@ -15,12 +15,12 @@
           name = "dotnet";
           nativeBuildInputs = with pkgs; [
             dotnetCorePackages.sdk_9_0
-            dotnetCorePackages.runtime_9_0
-            dotnetCorePackages.aspnetcore_9_0
+            libmsquic
           ];
 
           DOTNET_BIN = "${pkgs.dotnetCorePackages.sdk_9_0}/bin/dotnet";
           DOTNET_ROOT = "${pkgs.dotnetCorePackages.sdk_9_0}/share/dotnet";
+          LD_LIBRARY_PATH = "/run/current-system/sw/lib";
         };
       };
   };

@@ -9,13 +9,16 @@ namespace Demo.JobService.Jobs;
 public class JobWorker(ActivitySource activitySource,
                        UserRepository userRepository,
                        JobConfig config,
-                       EmailFaker emailFaker)
+                       EmailFaker emailFaker,
+                       IHttpClientFactory httpClientFactory)
 {
     #region Private Fields
 
     private readonly ActivitySource _activitySource = activitySource;
     private readonly JobConfig _config = config;
     private readonly UserRepository _userRepository = userRepository;
+    private readonly EmailFaker _emailFaker = emailFaker;
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
     #endregion Private Fields
 
@@ -30,7 +33,7 @@ public class JobWorker(ActivitySource activitySource,
     public async Task DoWork(CancellationToken cancellationToken)
     {
         using var activity = _activitySource.StartActivity("Worker started", ActivityKind.Consumer);
-        using var httpClient = new HttpClient();
+        var httpClient = _httpClientFactory.CreateClient("jobs");
 
         var randomIndex = new Random().Next(0, _config.TargetUrls.Count());
         var targetUrl = _config.TargetUrls.ElementAt(randomIndex)
@@ -52,7 +55,7 @@ public class JobWorker(ActivitySource activitySource,
 
         await httpClient.DeleteAsync($"User/{firstEmail}", cancellationToken);
 
-        var randomEmail = emailFaker.Generate(1)[0];
+        var randomEmail = _emailFaker.Generate(1)[0];
         activity?.SetTag("AddedUser", randomEmail);
 
         var usersToAdd = new List<User>
