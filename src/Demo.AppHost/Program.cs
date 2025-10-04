@@ -13,6 +13,7 @@ foreach (var serviceIndex in services)
     var demoDb = sql.AddDatabase("DB-" + serviceIndex);
 
     var migration = builder.AddProject<Projects.Demo_MigrationService>("Migration-" + serviceIndex)
+        .WithIconName("Wrench")
         .WithEnvironment("SERVICE_NAME", "Migration-" + serviceIndex)
         .WithEnvironment("SERVICE_INDEX", serviceIndex.ToString())
         //.WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
@@ -20,6 +21,7 @@ foreach (var serviceIndex in services)
         .WaitFor(demoDb);
 
     builder.AddProject<Projects.Demo_JobService>(serviceName)
+        .WithIconName("Play")
         .WithEnvironment("SERVICE_NAME", serviceName)
         .WithEnvironment("SERVICE_INDEX", serviceIndex.ToString())
         .WithEnvironment("TARGET_URLS", urls)
