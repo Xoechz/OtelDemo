@@ -11,6 +11,7 @@ public class JobWorker(ActivitySource activitySource,
                        UserRepository userRepository,
                        JobConfig config,
                        EmailFaker emailFaker,
+                       JobFaker jobFaker,
                        IHttpClientFactory httpClientFactory)
 {
     #region Private Fields
@@ -19,6 +20,7 @@ public class JobWorker(ActivitySource activitySource,
     private readonly JobConfig _config = config;
     private readonly UserRepository _userRepository = userRepository;
     private readonly EmailFaker _emailFaker = emailFaker;
+    private readonly JobFaker _jobFaker = jobFaker;
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
     #endregion Private Fields
@@ -33,17 +35,23 @@ public class JobWorker(ActivitySource activitySource,
 
     public async Task DoWork(CancellationToken cancellationToken)
     {
-        using var activity = _activitySource.StartActivity("Worker.DoWork");
+        using var activity = _activitySource.StartActivity(_jobFaker.Generate(1)[0]);
         activity?.SetTag("dito.job_id", _config.ServiceName);
-        activity?.SetTag("dito.source", _config.ServiceIndex);
+        activity?.SetTag("dito.source", $"Worker {_config.ServiceIndex}");
         activity?.SetTag("dito.entity_type", "User");
         var httpClient = _httpClientFactory.CreateClient("jobs");
 
         var randomIndex = new Random().Next(0, _config.TargetUrls.Count());
+
+        if (randomIndex == _config.ServiceIndex)
+        {
+            randomIndex = (randomIndex + 1) % _config.TargetUrls.Count();
+        }
+
         var targetUrl = _config.TargetUrls.ElementAt(randomIndex)
             ?? throw new InvalidOperationException("No target URL provided");
 
-        activity?.SetTag("dito.destination", randomIndex);
+        activity?.SetTag("dito.destination", $"Worker {randomIndex}");
         activity?.SetTag("TargetUrl", targetUrl);
 
         httpClient.BaseAddress = new Uri(targetUrl);
@@ -57,7 +65,7 @@ public class JobWorker(ActivitySource activitySource,
 
         foreach (var user in users)
         {
-            using var userActivity = _activitySource.StartActivity("Worker.ProcessUser");
+            using var userActivity = _activitySource.StartActivity($"Processing User {user.EmailAddress}");
             userActivity?.SetTag("dito.key", user.EmailAddress);
             var error = Utils.GetRandomErrorType(_config.ErrorChances);
 

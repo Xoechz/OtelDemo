@@ -4,6 +4,7 @@ using Demo.Data.Repositories;
 using Demo.JobService.Config;
 using Demo.JobService.Jobs;
 using Demo.ServiceDefaults;
+using Demo.ServiceDefaults.Faker;
 using Hangfire;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +46,8 @@ builder.Services.AddHttpClient("jobs", client =>
     ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
     AutomaticDecompression = DecompressionMethods.All,
 });
+
+builder.Services.AddSingleton(new JobFaker(serviceIndexValue));
 
 builder.Services.AddHangfireServer()
     .AddSingleton<RecurringJobScheduler>()
