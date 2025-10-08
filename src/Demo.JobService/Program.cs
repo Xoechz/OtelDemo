@@ -69,7 +69,9 @@ builder.Services.AddSingleton(new JobConfig
         { ErrorType.None, 0.99m },
         { ErrorType.Validation, 0.09m },
         { ErrorType.Critical, 0.01m },
-    }
+    },
+    ServiceName = builder.Configuration["SERVICE_NAME"] ?? "JobService",
+    ServiceIndex = serviceIndexValue,
 });
 
 var app = builder.Build();

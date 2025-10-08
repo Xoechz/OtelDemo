@@ -10,7 +10,8 @@ public class JobConfig
 
     public string? CronExpression { get; set; }
 
-    public string? DatabaseName { get; set; }
+    public string? ServiceName { get; set; }
+    public int? ServiceIndex { get; set; }
 
     public IDictionary<ErrorType, decimal> ErrorChances { get; set; } = new Dictionary<ErrorType, decimal>();
 

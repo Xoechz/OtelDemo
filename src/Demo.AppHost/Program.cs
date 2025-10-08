@@ -16,7 +16,7 @@ foreach (var serviceIndex in services)
         .WithIconName("Wrench")
         .WithEnvironment("SERVICE_NAME", "Migration-" + serviceIndex)
         .WithEnvironment("SERVICE_INDEX", serviceIndex.ToString())
-        //.WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
+        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
         .WithReference(demoDb)
         .WaitFor(demoDb);
 
@@ -26,7 +26,7 @@ foreach (var serviceIndex in services)
         .WithEnvironment("SERVICE_INDEX", serviceIndex.ToString())
         .WithEnvironment("TARGET_URLS", urls)
         .WithEnvironment("CRON_EXPRESSION", "*/" + (serviceIndex + 1) + " * * * *")
-        //.WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
+        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
         .WithReference(demoDb)
         .WaitForCompletion(migration);
 }

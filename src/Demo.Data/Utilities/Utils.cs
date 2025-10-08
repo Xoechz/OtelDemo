@@ -2,7 +2,7 @@
 
 namespace Demo.Data.Utilities;
 
-public static class Utlis
+public static class Utils
 {
     #region Public Methods
 

@@ -1,5 +1,6 @@
 ﻿using Demo.Data.Models;
 using Demo.Data.Repositories;
+using Demo.Data.Utilities;
 using Demo.JobService.Config;
 using Demo.ServiceDefaults.Faker;
 using System.Diagnostics;
@@ -32,13 +33,17 @@ public class JobWorker(ActivitySource activitySource,
 
     public async Task DoWork(CancellationToken cancellationToken)
     {
-        using var activity = _activitySource.StartActivity("Worker started", ActivityKind.Consumer);
+        using var activity = _activitySource.StartActivity("Worker.DoWork");
+        activity?.SetTag("dito.job_id", _config.ServiceName);
+        activity?.SetTag("dito.source", _config.ServiceIndex);
+        activity?.SetTag("dito.entity_type", "User");
         var httpClient = _httpClientFactory.CreateClient("jobs");
 
         var randomIndex = new Random().Next(0, _config.TargetUrls.Count());
         var targetUrl = _config.TargetUrls.ElementAt(randomIndex)
             ?? throw new InvalidOperationException("No target URL provided");
 
+        activity?.SetTag("dito.destination", randomIndex);
         activity?.SetTag("TargetUrl", targetUrl);
 
         httpClient.BaseAddress = new Uri(targetUrl);
@@ -49,6 +54,19 @@ public class JobWorker(ActivitySource activitySource,
 
         activity?.SetTag("UserCount", users.Count());
         await _userRepository.AddUsersAsync(users);
+
+        foreach (var user in users)
+        {
+            using var userActivity = _activitySource.StartActivity("Worker.ProcessUser");
+            userActivity?.SetTag("dito.key", user.EmailAddress);
+            var error = Utils.GetRandomErrorType(_config.ErrorChances);
+
+            if (error != ErrorType.None)
+            {
+                userActivity?.SetStatus(ActivityStatusCode.Error, $"Simulated {error} error for user {user.EmailAddress}");
+                userActivity?.SetTag("ErrorType", error.ToString());
+            }
+        }
 
         var firstEmail = users.First().EmailAddress;
         activity?.SetTag("DeletedUser", firstEmail);

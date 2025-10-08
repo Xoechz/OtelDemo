@@ -82,7 +82,7 @@ public class UserRepository(DemoContext demoContext, ILogger<UserRepository> log
         var list = await _context.Users.Select(entity => new User
         {
             EmailAddress = entity.EmailAddress,
-            Error = errorChances != null ? Utlis.GetRandomErrorType(errorChances) : ErrorType.None
+            Error = errorChances != null ? Utils.GetRandomErrorType(errorChances) : ErrorType.None
         }).ToListAsync();
 
         activity?.SetTag("user.count", list.Count);
