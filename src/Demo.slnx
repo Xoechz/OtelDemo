@@ -10,5 +10,6 @@
   <Project Path="Demo.MigrationService/Demo.MigrationService.csproj" />
   <Project Path="Demo.OpenTelemetry.Jobs/Demo.OpenTelemetry.Jobs.csproj" />
   <Project Path="Demo.OpenTelemetry/Demo.OpenTelemetry.csproj" />
+  <Project Path="Demo.Dito/Demo.Dito.csproj" />
   <Project Path="Demo.ServiceDefaults/Demo.ServiceDefaults.csproj" />
 </Solution>

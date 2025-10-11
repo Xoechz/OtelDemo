@@ -1,6 +1,7 @@
 ﻿using Demo.Data.Models;
 using Demo.Data.Repositories;
 using Demo.Data.Utilities;
+using Demo.Dito.Extensions;
 using Demo.JobService.Config;
 using Demo.ServiceDefaults.Faker;
 using System.Diagnostics;
@@ -35,12 +36,6 @@ public class JobWorker(ActivitySource activitySource,
 
     public async Task DoWork(CancellationToken cancellationToken)
     {
-        using var activity = _activitySource.StartActivity(_jobFaker.Generate(1)[0]);
-        activity?.SetTag("dito.job_id", _config.ServiceName);
-        activity?.SetTag("dito.source", $"Worker {_config.ServiceIndex}");
-        activity?.SetTag("dito.entity_type", "User");
-        var httpClient = _httpClientFactory.CreateClient("jobs");
-
         var randomIndex = new Random().Next(0, _config.TargetUrls.Count());
 
         if (randomIndex == _config.ServiceIndex)
@@ -48,10 +43,16 @@ public class JobWorker(ActivitySource activitySource,
             randomIndex = (randomIndex + 1) % _config.TargetUrls.Count();
         }
 
+        using var activity = _activitySource.StartJobActivity(_jobFaker.Generate(1)[0], _config.ServiceName ?? "Unknown",
+            source: $"Worker {_config.ServiceIndex}",
+            destination: $"Worker {randomIndex}",
+            entityType: "User");
+
+        var httpClient = _httpClientFactory.CreateClient("jobs");
+
         var targetUrl = _config.TargetUrls.ElementAt(randomIndex)
             ?? throw new InvalidOperationException("No target URL provided");
 
-        activity?.SetTag("dito.destination", $"Worker {randomIndex}");
         activity?.SetTag("TargetUrl", targetUrl);
 
         httpClient.BaseAddress = new Uri(targetUrl);
@@ -65,8 +66,8 @@ public class JobWorker(ActivitySource activitySource,
 
         foreach (var user in users)
         {
-            using var userActivity = _activitySource.StartActivity($"Processing User {user.EmailAddress}");
-            userActivity?.SetTag("dito.key", user.EmailAddress);
+            using var userActivity = _activitySource.StartEntityActivity("ProcessUser", user.EmailAddress);
+
             var error = Utils.GetRandomErrorType(_config.ErrorChances);
 
             if (error != ErrorType.None)

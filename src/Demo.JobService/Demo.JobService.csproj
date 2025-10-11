@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Demo.Data\Demo.Data.csproj" />
+    <ProjectReference Include="..\Demo.Dito\Demo.Dito.csproj" />
     <ProjectReference Include="..\Demo.ServiceDefaults\Demo.ServiceDefaults.csproj" />
   </ItemGroup>
 
