@@ -1,5 +1,6 @@
 using Demo.Data;
-using Demo.ServiceDefaults.Faker;
+using Demo.Models.Extensions;
+using Demo.Models.Faker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -9,14 +10,14 @@ namespace Demo.MigrationService;
 
 public class Worker(IServiceProvider serviceProvider,
                     IHostApplicationLifetime hostApplicationLifetime,
-                    EmailFaker emailFaker,
+                    ItemFaker orderFaker,
                     ActivitySource activitySource)
     : BackgroundService
 {
     #region Private Fields
 
     private readonly ActivitySource _activitySource = activitySource;
-    private readonly EmailFaker _emailFaker = emailFaker;
+    private readonly ItemFaker _orderFaker = orderFaker;
     private readonly IHostApplicationLifetime _hostApplicationLifetime = hostApplicationLifetime;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
@@ -74,15 +75,21 @@ public class Worker(IServiceProvider serviceProvider,
 
     private async Task SeedDataAsync(DemoContext dbContext, CancellationToken cancellationToken)
     {
-        var users = _emailFaker.Generate(100).Select(e => new Data.Entities.User { EmailAddress = e });
+        var items = _orderFaker.Generate(100)
+            .Deduplicate()
+            .Select(o => new Data.Entities.Item
+            {
+                ArticleName = o.ArticleName,
+                Stock = o.Stock
+            }).ToList();
 
         var strategy = dbContext.Database.CreateExecutionStrategy();
         await strategy.ExecuteAsync(async () =>
         {
             // Seed the database
             await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
-            dbContext.Users.RemoveRange(dbContext.Users);
-            await dbContext.Users.AddRangeAsync(users, cancellationToken);
+            dbContext.Items.RemoveRange(dbContext.Items);
+            await dbContext.Items.AddRangeAsync(items, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         });

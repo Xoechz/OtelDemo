@@ -2,11 +2,11 @@ using Bogus;
 
 namespace Demo.Models.Faker;
 
-public class OrderFaker : Faker<Order>
+public class ItemFaker : Faker<Item>
 {
     #region Public Constructors
 
-    public OrderFaker(int seed)
+    public ItemFaker(int seed)
     {
         ConfigureOrderFaker(seed);
     }
@@ -18,8 +18,7 @@ public class OrderFaker : Faker<Order>
     private void ConfigureOrderFaker(int seed)
     {
         UseSeed(seed)
-            .RuleFor(o => o.ArticleName, f => f.Commerce.ProductName())
-            .RuleFor(o => o.Stock, f => f.Random.Int(1, 20));
+            .CustomInstantiator(f => new(f.Commerce.ProductName(), f.Random.Int(1, 20)));
     }
 
     #endregion Private Methods

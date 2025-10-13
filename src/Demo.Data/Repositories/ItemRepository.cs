@@ -1,29 +1,38 @@
 ﻿using Demo.Dito.Extensions;
 using Demo.Models;
+using Demo.Models.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace Demo.Data.Repositories;
 
 public class ItemRepository(DemoContext demoContext,
-                            ActivitySource activitySource)
+                            ActivitySource activitySource,
+                            ILogger<ItemRepository> logger)
 {
     #region Private Fields
 
     private readonly ActivitySource _activitySource = activitySource;
     private readonly DemoContext _context = demoContext;
+    private readonly ILogger<ItemRepository> _logger = logger;
 
     #endregion Private Fields
 
     #region Public Methods
 
-    public async Task<bool> AddStockAsync(IEnumerable<Order> items)
+    public async Task AddStockAsync(List<Models.Item> items)
     {
+        if (items.Count == 0)
+        {
+            return;
+        }
+
         var existingItems = await _context.Items
             .Where(dbItem => items.Select(i => i.ArticleName).Contains(dbItem.ArticleName))
             .ToListAsync();
 
-        foreach (var item in items)
+        foreach (var item in items.Deduplicate())
         {
             var dbItem = existingItems.FirstOrDefault(ei => ei.ArticleName == item.ArticleName);
             if (dbItem is not null)
@@ -41,17 +50,16 @@ public class ItemRepository(DemoContext demoContext,
         }
 
         await _context.SaveChangesAsync();
-        return true;
     }
 
-    public async Task<List<Order>> GetItemsFromOrderAsync(IEnumerable<Order> items)
+    public async Task<List<Models.Item>> GetItemsFromOrderAsync(IEnumerable<Models.Item> items)
     {
-        List<Order> result = [];
+        List<Item> result = [];
         var dbItems = await _context.Items
              .Where(dbItem => items.Select(i => i.ArticleName).Contains(dbItem.ArticleName))
              .ToListAsync();
 
-        foreach (var item in items)
+        foreach (var item in items.Deduplicate())
         {
             using var activity = _activitySource.StartEntityActivity("GetItemsFromOrderAsync", item.ArticleName);
             activity?.SetTag("item.requested", item.Stock);
@@ -63,20 +71,23 @@ public class ItemRepository(DemoContext demoContext,
 
                 if (dbItem.Stock >= item.Stock)
                 {
-                    result.Add(new Order(item.ArticleName, item.Stock));
+                    result.Add(new Item(item.ArticleName, item.Stock));
                     dbItem.Stock -= item.Stock;
+                    _logger.LogInformation("Item {ItemName} is in stock", item.ArticleName);
                     activity?.SetStatus(ActivityStatusCode.Ok, "Item is in stock");
                 }
                 else
                 {
-                    result.Add(new Order(item.ArticleName, dbItem.Stock));
+                    result.Add(new Item(item.ArticleName, dbItem.Stock));
                     dbItem.Stock = 0;
+                    _logger.LogWarning("Not enough stock available for item {ItemName}", item.ArticleName);
                     activity?.SetStatus(ActivityStatusCode.Error, "Not enough stock available");
                 }
             }
             else
             {
                 activity?.SetTag("item.available", 0);
+                _logger.LogError("Item {ItemName} not found in inventory", item.ArticleName);
                 activity?.SetStatus(ActivityStatusCode.Error, "Item not found in inventory");
             }
         }

@@ -1,6 +1,6 @@
 ﻿namespace Demo.Models;
 
-public class Order(string articleName, int stock)
+public class Item(string articleName, int stock)
 {
     #region Public Properties
 

@@ -1,6 +1,4 @@
 using Demo.OpenTelemetry.Jobs.Extensions;
-using Demo.ServiceDefaults.Faker;
-using Hangfire.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,8 +39,6 @@ public static class Extensions
             // Turn on service discovery by default
             http.AddServiceDiscovery();
         });
-
-        builder.Services.AddSingleton<EmailFaker>();
 
         return builder;
     }

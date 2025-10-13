@@ -43,7 +43,7 @@ public class OpenTelemetryHangfireFilter(ActivitySource activitySource) : IApply
         }
 
         var jobName = context.GetJobParameter<string>("RecurringJobId");
-        var activity = _activitySource.StartActivity("HangfireJobPerforming");
+        var activity = _activitySource.StartActivity("HangfireJobPerforming", ActivityKind.Server);
 
         if (activity is null)
         {

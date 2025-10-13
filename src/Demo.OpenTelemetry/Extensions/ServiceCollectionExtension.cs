@@ -24,76 +24,6 @@ public static class ServiceCollectionExtension
     #endregion Private Members
 
     #region Public Methods
-
-    public static IServiceCollection ConfigureApplicationInsights(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
-    {
-        var serviceName = configuration["SERVICE_NAME"] ?? environment.ApplicationName;
-        SetupActivitySource(services, serviceName);
-
-        // Check if the Azure Monitor is configured via environment variables.
-        var useAzureMonitor = !string.IsNullOrWhiteSpace(configuration[APP_INSIGHTS_CONFIG]);
-
-        if (useAzureMonitor)
-        {
-            services.AddApplicationInsightsTelemetry(options =>
-            {
-                options.ConnectionString = configuration[APP_INSIGHTS_CONFIG];
-            });
-        }
-
-        return services;
-    }
-
-    /// <summary>
-    /// Configures basic OpenTelemetry.
-    /// </summary>
-    /// <param name="services"><see cref="IServiceCollection"/></param>
-    /// <param name="configuration"><see cref="IConfiguration"/></param>
-    /// <returns><see cref="IServiceCollection"/> for method chaining</returns>
-    public static IServiceCollection ConfigureBasicOpenTelemetry(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
-    {
-        var serviceName = configuration["SERVICE_NAME"] ?? environment.ApplicationName;
-        SetupActivitySource(services, serviceName);
-
-        var otelBuilder = services.AddOpenTelemetry()
-            .WithLogging()
-            .WithMetrics(metrics =>
-            {
-                metrics.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddSqlClientInstrumentation()
-                    .AddRuntimeInstrumentation()
-                    .AddProcessInstrumentation();
-            })
-            .WithTracing(tracing =>
-            {
-                tracing.AddAspNetCoreInstrumentation()
-                    .AddEntityFrameworkCoreInstrumentation()
-                    .AddHttpClientInstrumentation();
-            });
-
-        // Check if the OTLP exporter or Azure Monitor is configured via environment variables.
-        var useOtlpExporter = !string.IsNullOrWhiteSpace(configuration[OTEL_CONFIG]);
-        var useAzureMonitor = !string.IsNullOrWhiteSpace(configuration[APP_INSIGHTS_CONFIG]);
-
-        if (useOtlpExporter)
-        {
-            // Aspire sets the OTEL_EXPORTER_OTLP_ENDPOINT environment variable to the OpenTelemetry Collector endpoint automatically.
-            // This is then only used locally.
-            // Without Aspire no local OpenTelemetry Collector is used.
-            otelBuilder.UseOtlpExporter();
-        }
-
-        if (useAzureMonitor)
-        {
-            // If the APPLICATIONINSIGHTS_CONNECTION_STRING environment variable is set, the Azure Monitor exporter is used.
-            // Application Insights is a subsystem of Azure Monitor.
-            otelBuilder.UseAzureMonitorExporter();
-        }
-
-        return services;
-    }
-
     /// <summary>
     /// My way of OpenTelemetry configuration.
     /// </summary>
@@ -116,7 +46,12 @@ public static class ServiceCollectionExtension
     {
         var serviceName = configuration["SERVICE_NAME"] ?? environment.ApplicationName;
 
-        activitySource = SetupActivitySource(services, serviceName);
+        // for manual trace instrumentation
+        // to use it, inject the ActivitySource into you class and then create an Activity like this:
+        // using (var activity = activitySource.StartActivity("MyOperation"))
+        // Do not forget the using statement or dispose the activity manually to end the trace.
+        activitySource = new ActivitySource(serviceName);
+        services.AddSingleton(activitySource);
 
         // OpenTelemetry configuration
         var otelBuilder = services.AddOpenTelemetry()
@@ -182,19 +117,4 @@ public static class ServiceCollectionExtension
     }
 
     #endregion Public Methods
-
-    #region Private Methods
-
-    private static ActivitySource SetupActivitySource(this IServiceCollection services, string serviceName)
-    {
-        // for manual trace instrumentation
-        // to use it, inject the ActivitySource into you class and then create an Activity like this:
-        // using (var activity = activitySource.StartActivity("MyOperation"))
-        // Do not forget the using statement or dispose the activity manually to end the trace.
-        var activitySource = new ActivitySource(serviceName);
-        services.AddSingleton(activitySource);
-        return activitySource;
-    }
-
-    #endregion Private Methods
 }
