@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Demo.Data.Migrations
 {
     [DbContext(typeof(DemoContext))]
-    [Migration("20250811132132_Initial")]
+    [Migration("20251013070906_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -19,20 +19,23 @@ namespace Demo.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.2")
+                .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Demo.Data.Entities.User", b =>
+            modelBuilder.Entity("Demo.Data.Entities.Item", b =>
                 {
-                    b.Property<string>("EmailAddress")
+                    b.Property<string>("ArticleName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("EmailAddress");
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
 
-                    b.ToTable("Users");
+                    b.HasKey("ArticleName");
+
+                    b.ToTable("Items");
                 });
 #pragma warning restore 612, 618
         }

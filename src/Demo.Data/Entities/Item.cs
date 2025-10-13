@@ -2,12 +2,15 @@
 
 namespace Demo.Data.Entities;
 
-public class User
+public class Item
 {
     #region Public Properties
 
     [Key, MaxLength(50)]
-    public required string EmailAddress { get; set; }
+    public required string ArticleName { get; set; }
+
+    [Required]
+    public required int Stock { get; set; }
 
     #endregion Public Properties
 }

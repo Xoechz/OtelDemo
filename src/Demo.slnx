@@ -8,6 +8,7 @@
   <Project Path="Demo.Data/Demo.Data.csproj" />
   <Project Path="Demo.JobService/Demo.JobService.csproj" />
   <Project Path="Demo.MigrationService/Demo.MigrationService.csproj" />
+  <Project Path="Demo.Models/Demo.Models.csproj" />
   <Project Path="Demo.OpenTelemetry.Jobs/Demo.OpenTelemetry.Jobs.csproj" />
   <Project Path="Demo.OpenTelemetry/Demo.OpenTelemetry.csproj" />
   <Project Path="Demo.Dito/Demo.Dito.csproj" />
