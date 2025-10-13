@@ -50,7 +50,7 @@ builder.Services.AddHttpClient("client", client =>
     AutomaticDecompression = DecompressionMethods.All,
 });
 
-builder.Services.AddSingleton(new ItemFaker(serviceIndex));
+builder.Services.AddSingleton(new ItemFaker(serviceIndex + 100));
 
 builder.Services.AddHangfireServer()
     .AddTransient<OrderWorker>()
