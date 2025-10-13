@@ -6,14 +6,14 @@ public class FailureFaker : Faker<string?>
 {
     #region Private Fields
 
-    private readonly List<string> _errorMessages = new()
-    {
+    private readonly List<string> _errorMessages =
+    [
         "Payment failed",
         "Address not serviceable",
         "Item lost in transit",
         "Item reserved for another customer",
         "Item not deliverable, due to personal grudge against customer",
-    };
+    ];
 
     #endregion Private Fields
 

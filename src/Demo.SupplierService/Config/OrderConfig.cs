@@ -6,11 +6,11 @@ public class SupplierConfig(int serviceIndex, int warehouseCount, IDictionary<in
 {
     #region Public Properties
 
+    public ReadOnlyDictionary<int, string> RedirectionUrls { get; set; } = new(redirectionUrls);
+
     public int ServiceIndex { get; set; } = serviceIndex;
 
     public int WarehouseCount { get; set; } = warehouseCount;
-
-    public ReadOnlyDictionary<int, string> RedirectionUrls { get; set; } = new(redirectionUrls);
 
     #endregion Public Properties
 }

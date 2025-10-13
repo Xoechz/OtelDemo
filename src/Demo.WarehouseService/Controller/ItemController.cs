@@ -1,11 +1,11 @@
-using System.Diagnostics;
 using Demo.Data.Repositories;
+using Demo.Dito.Extensions;
 using Demo.Models;
 using Demo.Models.Extensions;
 using Demo.Models.Faker;
-using Demo.Dito.Extensions;
 using Demo.WarehouseService.Config;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Demo.WarehouseService.Controller;
 
@@ -21,12 +21,12 @@ public class ItemController(ItemRepository itemRepository,
 {
     #region Private Fields
 
-    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("client");
     private readonly ActivitySource _activitySource = activitySource;
-    private readonly ItemRepository _itemRepository = itemRepository;
-    private readonly ILogger<ItemController> _logger = logger;
     private readonly WarehouseConfig _config = config;
     private readonly FailureFaker _failureFaker = failureFaker;
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("client");
+    private readonly ItemRepository _itemRepository = itemRepository;
+    private readonly ILogger<ItemController> _logger = logger;
     private readonly Random _rand = new();
 
     #endregion Private Fields
@@ -71,6 +71,23 @@ public class ItemController(ItemRepository itemRepository,
 
     #region Private Methods
 
+    private async Task<HttpResponseMessage?> RedirectItemsAsync(List<Item> items, string operation)
+    {
+        if (items.Count == 0)
+        {
+            return null;
+        }
+
+        var redirectIndex = _rand.Next(_config.WarehouseCount);
+        redirectIndex = redirectIndex == _config.ServiceIndex ? (redirectIndex + 1) % _config.WarehouseCount : redirectIndex;
+        var redirectUrl = _config.RedirectionUrls[redirectIndex];
+        _logger.LogWarning("Redirecting {Count} items to WarehouseService-{RedirectIndex} for operation {Operation}", items.Count, redirectIndex, operation);
+
+        var response = await _httpClient.PostAsJsonAsync($"{redirectUrl}/item/{operation}", items);
+        response.EnsureSuccessStatusCode();
+        return response;
+    }
+
     private (List<Item>, List<Item>) SplitItems(IEnumerable<Item> items, string operation)
     {
         List<Item> acceptedItems = [];
@@ -101,23 +118,6 @@ public class ItemController(ItemRepository itemRepository,
         }
 
         return (acceptedItems, redirectedItems);
-    }
-
-    private async Task<HttpResponseMessage?> RedirectItemsAsync(List<Item> items, string operation)
-    {
-        if (items.Count == 0)
-        {
-            return null;
-        }
-
-        var redirectIndex = _rand.Next(_config.WarehouseCount);
-        redirectIndex = redirectIndex == _config.ServiceIndex ? (redirectIndex + 1) % _config.WarehouseCount : redirectIndex;
-        var redirectUrl = _config.RedirectionUrls[redirectIndex];
-        _logger.LogWarning("Redirecting {Count} items to WarehouseService-{redirectIndex} for operation {Operation}", items.Count, redirectIndex, operation);
-
-        var response = await _httpClient.PostAsJsonAsync($"{redirectUrl}/item/{operation}", items);
-        response.EnsureSuccessStatusCode();
-        return response;
     }
 
     #endregion Private Methods

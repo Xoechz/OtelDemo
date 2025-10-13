@@ -1,13 +1,13 @@
 using Demo.Models.Faker;
+using Demo.ServiceDefaults;
 using Demo.SupplierService;
 using Demo.SupplierService.Config;
-using Demo.ServiceDefaults;
 using Hangfire;
 using Hangfire.Common;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
-using Hangfire.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -18,11 +18,11 @@ public class WarehouseConfig
 
     #region Public Properties
 
+    public ReadOnlyDictionary<int, string> RedirectionUrls { get; }
+
     public int ServiceIndex { get; }
 
     public int WarehouseCount { get; }
-
-    public ReadOnlyDictionary<int, string> RedirectionUrls { get; }
 
     #endregion Public Properties
 }

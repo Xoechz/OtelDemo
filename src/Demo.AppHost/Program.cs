@@ -4,6 +4,8 @@ const int ORDER_SERVICE_COUNT = 2;
 const int WAREHOUSE_SERVICE_COUNT = 5;
 const int SUPPLIER_SERVICE_COUNT = 2;
 
+const string OTEL_COLLECTOR_ENDPOINT = "http://localhost:4317";
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var sql = builder.AddSqlServer("sql")
@@ -30,7 +32,7 @@ foreach (var serviceIndex in warehouseServiceIds)
         .WithIconName("Wrench")
         .WithEnvironment("SERVICE_NAME", "Migration-" + serviceIndex)
         .WithEnvironment("SERVICE_INDEX", serviceIndex.ToString())
-        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
+        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", OTEL_COLLECTOR_ENDPOINT)
         .WithReference(demoDb)
         .WaitFor(demoDb);
 
@@ -40,7 +42,7 @@ foreach (var serviceIndex in warehouseServiceIds)
          .WithEnvironment("SERVICE_INDEX", serviceIndex.ToString())
          .WithEnvironment("WAREHOUSE_COUNT", WAREHOUSE_SERVICE_COUNT.ToString())
          .WithEnvironment("REDIRECTION_URLS", urls)
-         .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
+         .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", OTEL_COLLECTOR_ENDPOINT)
          .WithReference(demoDb)
          .WaitForCompletion(migration);
 
@@ -58,7 +60,7 @@ for (var i = 0; i < ORDER_SERVICE_COUNT; i++)
         .WithEnvironment("SERVICE_INDEX", i.ToString())
         .WithEnvironment("WAREHOUSE_COUNT", WAREHOUSE_SERVICE_COUNT.ToString())
         .WithEnvironment("REDIRECTION_URLS", urls)
-        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
+        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", OTEL_COLLECTOR_ENDPOINT)
         .WithReference(db)
         .WaitFor(db);
 
@@ -79,7 +81,7 @@ for (var i = 0; i < SUPPLIER_SERVICE_COUNT; i++)
         .WithEnvironment("SERVICE_INDEX", i.ToString())
         .WithEnvironment("WAREHOUSE_COUNT", WAREHOUSE_SERVICE_COUNT.ToString())
         .WithEnvironment("REDIRECTION_URLS", urls)
-        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
+        .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", OTEL_COLLECTOR_ENDPOINT)
         .WithReference(db)
         .WaitFor(db);
 

@@ -17,8 +17,8 @@ public class Worker(IServiceProvider serviceProvider,
     #region Private Fields
 
     private readonly ActivitySource _activitySource = activitySource;
-    private readonly ItemFaker _orderFaker = orderFaker;
     private readonly IHostApplicationLifetime _hostApplicationLifetime = hostApplicationLifetime;
+    private readonly ItemFaker _orderFaker = orderFaker;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     #endregion Private Fields

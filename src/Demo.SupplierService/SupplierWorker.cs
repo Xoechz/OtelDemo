@@ -1,8 +1,7 @@
 ﻿using Demo.Dito.Extensions;
-using Demo.SupplierService.Config;
 using Demo.Models.Faker;
+using Demo.SupplierService.Config;
 using System.Diagnostics;
-using Demo.Data.Entities;
 
 namespace Demo.SupplierService;
 
@@ -15,8 +14,8 @@ public class SupplierWorker(ActivitySource activitySource,
 
     private readonly ActivitySource _activitySource = activitySource;
     private readonly SupplierConfig _config = config;
-    private readonly ItemFaker _jobFaker = itemFaker;
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient("client");
+    private readonly ItemFaker _jobFaker = itemFaker;
     private readonly Random _rand = new();
 
     #endregion Private Fields
@@ -27,7 +26,7 @@ public class SupplierWorker(ActivitySource activitySource,
     {
         var randomIndex = _rand.Next(0, _config.WarehouseCount);
 
-        using var activity = _activitySource.StartJobActivity("SupplierService.DoWork", $"Supplying Items",
+        using var activity = _activitySource.StartJobActivity("SupplierService.DoWork", "Supplying Items",
             source: $"WarehouseService-{randomIndex}",
             destination: $"SupplierService-{_config.ServiceIndex}",
             entityType: "Item");

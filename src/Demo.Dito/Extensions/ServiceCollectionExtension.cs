@@ -7,7 +7,7 @@ namespace Demo.Dito.Extensions;
 /// </summary>
 public static class ActivitySourceExtensions
 {
-    #region Private Members
+    #region Private Fields
 
     private const string DESTINATION = "dito.destination";
     private const string ENTITY_KEY = "dito.key";
@@ -16,9 +16,35 @@ public static class ActivitySourceExtensions
     private const string JOB_SPAN_ID = "dito.job_span_id";
     private const string SOURCE = "dito.source";
 
-    #endregion Private Members
+    #endregion Private Fields
 
     #region Public Methods
+
+    /// <summary>
+    /// Starts an activity for a specific entity, propagating the job span ID if available.
+    /// </summary>
+    /// <param name="activitySource">The activity source, which creates the activity.</param>
+    /// <param name="name">The activity name.</param>
+    /// <param name="entityKey">The entity key to group by with dito.</param>
+    /// <returns><see cref="IDisposable"/> <see cref="Activity"/></returns>
+    public static Activity? StartEntityActivity(this ActivitySource activitySource, string name, string entityKey)
+    {
+        var activity = activitySource.StartActivity(name);
+
+        if (activity != null)
+        {
+            activity.SetTag(ENTITY_KEY, entityKey);
+            activity.DisplayName = $"{name} - {entityKey}";
+            var baggageValue = activity.GetBaggageItem(JOB_SPAN_ID);
+
+            if (baggageValue != null)
+            {
+                activity.AddTag(JOB_SPAN_ID, baggageValue);
+            }
+        }
+
+        return activity;
+    }
 
     /// <summary>
     /// Starts an activity for a job. Propagates the job span ID as baggage.
@@ -51,32 +77,6 @@ public static class ActivitySourceExtensions
             if (entityType != null)
             {
                 activity.SetTag(ENTITY_TYPE, entityType);
-            }
-        }
-
-        return activity;
-    }
-
-    /// <summary>
-    /// Starts an activity for a specific entity, propagating the job span ID if available.
-    /// </summary>
-    /// <param name="activitySource">The activity source, which creates the activity.</param>
-    /// <param name="name">The activity name.</param>
-    /// <param name="entityKey">The entity key to group by with dito.</param>
-    /// <returns><see cref="IDisposable"/> <see cref="Activity"/></returns>
-    public static Activity? StartEntityActivity(this ActivitySource activitySource, string name, string entityKey)
-    {
-        var activity = activitySource.StartActivity(name);
-
-        if (activity != null)
-        {
-            activity.SetTag(ENTITY_KEY, entityKey);
-            activity.DisplayName = $"{name} - {entityKey}";
-            var baggageValue = activity.GetBaggageItem(JOB_SPAN_ID);
-
-            if (baggageValue != null)
-            {
-                activity.AddTag(JOB_SPAN_ID, baggageValue);
             }
         }
 

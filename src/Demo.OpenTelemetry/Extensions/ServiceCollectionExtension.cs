@@ -16,14 +16,15 @@ namespace Demo.OpenTelemetry.Extensions;
 /// </summary>
 public static class ServiceCollectionExtension
 {
-    #region Private Members
+    #region Private Fields
 
-    private const string OTEL_CONFIG = "OTEL_EXPORTER_OTLP_ENDPOINT";
     private const string APP_INSIGHTS_CONFIG = "APPLICATIONINSIGHTS_CONNECTION_STRING";
+    private const string OTEL_CONFIG = "OTEL_EXPORTER_OTLP_ENDPOINT";
 
-    #endregion Private Members
+    #endregion Private Fields
 
     #region Public Methods
+
     /// <summary>
     /// My way of OpenTelemetry configuration.
     /// </summary>

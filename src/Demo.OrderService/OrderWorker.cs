@@ -1,8 +1,8 @@
-﻿using Demo.Dito.Extensions;
-using Demo.OrderService.Config;
+﻿using Demo.Data.Entities;
+using Demo.Dito.Extensions;
 using Demo.Models.Faker;
+using Demo.OrderService.Config;
 using System.Diagnostics;
-using Demo.Data.Entities;
 
 namespace Demo.OrderService;
 
@@ -15,8 +15,8 @@ public class OrderWorker(ActivitySource activitySource,
 
     private readonly ActivitySource _activitySource = activitySource;
     private readonly OrderConfig _config = config;
-    private readonly ItemFaker _jobFaker = itemFaker;
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient("client");
+    private readonly ItemFaker _jobFaker = itemFaker;
     private readonly Random _rand = new();
 
     #endregion Private Fields
@@ -27,7 +27,7 @@ public class OrderWorker(ActivitySource activitySource,
     {
         var randomIndex = _rand.Next(0, _config.WarehouseCount);
 
-        using var activity = _activitySource.StartJobActivity("OrderService.DoWork", $"Ordering Items",
+        using var activity = _activitySource.StartJobActivity("OrderService.DoWork", "Ordering Items",
             source: $"WarehouseService-{randomIndex}",
             destination: $"OrderService-{_config.ServiceIndex}",
             entityType: "Item");

@@ -7,6 +7,15 @@ namespace Demo.Data.Migrations
     /// <inheritdoc />
     public partial class Initial : Migration
     {
+        #region Protected Methods
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "Items");
+        }
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -23,11 +32,6 @@ namespace Demo.Data.Migrations
                 });
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "Items");
-        }
+        #endregion Protected Methods
     }
 }
