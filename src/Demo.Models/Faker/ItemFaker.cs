@@ -18,7 +18,7 @@ public class ItemFaker : Faker<Item>
     private void ConfigureOrderFaker(int seed)
     {
         UseSeed(seed)
-            .CustomInstantiator(f => new(f.Commerce.ProductName(), f.Random.Int(1, 20)));
+            .CustomInstantiator(f => new($"{f.Commerce.ProductMaterial()} {f.Commerce.Product()}", f.Random.Int(1, 20)));
     }
 
     #endregion Private Methods

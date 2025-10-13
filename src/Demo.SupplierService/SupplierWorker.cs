@@ -35,7 +35,7 @@ public class SupplierWorker(ActivitySource activitySource,
         var targetUrl = _config.RedirectionUrls[randomIndex]
             ?? throw new InvalidOperationException("No target URL provided");
 
-        var requestedItems = _jobFaker.Generate(_rand.Next(1, 10));
+        var requestedItems = _jobFaker.Generate(_rand.Next(10, 20));
         activity?.SetTag("item.supplied.distinct", requestedItems.Count);
         activity?.SetTag("item.supplied.total", requestedItems.Sum(i => i.Stock));
 

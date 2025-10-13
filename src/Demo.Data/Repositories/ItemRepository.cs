@@ -23,6 +23,7 @@ public class ItemRepository(DemoContext demoContext,
 
     public async Task AddStockAsync(List<Models.Item> items)
     {
+        using var activity = _activitySource.StartActivity("Add stock");
         if (items.Count == 0)
         {
             return;
@@ -52,8 +53,9 @@ public class ItemRepository(DemoContext demoContext,
         await _context.SaveChangesAsync();
     }
 
-    public async Task<List<Models.Item>> GetItemsFromOrderAsync(IEnumerable<Models.Item> items)
+    public async Task<List<Models.Item>> GetItemsForOrderAsync(IEnumerable<Models.Item> items)
     {
+        using var activity = _activitySource.StartActivity("Get items for order");
         List<Item> result = [];
         var dbItems = await _context.Items
              .Where(dbItem => items.Select(i => i.ArticleName).Contains(dbItem.ArticleName))
@@ -61,34 +63,34 @@ public class ItemRepository(DemoContext demoContext,
 
         foreach (var item in items.Deduplicate())
         {
-            using var activity = _activitySource.StartEntityActivity("GetItemsFromOrderAsync", item.ArticleName);
-            activity?.SetTag("item.requested", item.Stock);
+            using var entityActivity = _activitySource.StartEntityActivity("Get item for order", item.ArticleName);
+            entityActivity?.SetTag("item.requested", item.Stock);
 
             var dbItem = dbItems.FirstOrDefault(di => di.ArticleName == item.ArticleName);
             if (dbItem is not null)
             {
-                activity?.SetTag("item.available", dbItem.Stock);
+                entityActivity?.SetTag("item.available", dbItem.Stock);
 
                 if (dbItem.Stock >= item.Stock)
                 {
                     result.Add(new Item(item.ArticleName, item.Stock));
                     dbItem.Stock -= item.Stock;
                     _logger.LogInformation("Item {ItemName} is in stock", item.ArticleName);
-                    activity?.SetStatus(ActivityStatusCode.Ok, "Item is in stock");
+                    entityActivity?.SetStatus(ActivityStatusCode.Ok, "Item is in stock");
                 }
                 else
                 {
                     result.Add(new Item(item.ArticleName, dbItem.Stock));
                     dbItem.Stock = 0;
                     _logger.LogWarning("Not enough stock available for item {ItemName}", item.ArticleName);
-                    activity?.SetStatus(ActivityStatusCode.Error, "Not enough stock available");
+                    entityActivity?.SetStatus(ActivityStatusCode.Error, "Not enough stock available");
                 }
             }
             else
             {
-                activity?.SetTag("item.available", 0);
+                entityActivity?.SetTag("item.available", 0);
                 _logger.LogError("Item {ItemName} not found in inventory", item.ArticleName);
-                activity?.SetStatus(ActivityStatusCode.Error, "Item not found in inventory");
+                entityActivity?.SetStatus(ActivityStatusCode.Error, "Item not found in inventory");
             }
         }
 

@@ -69,5 +69,6 @@ app.MapHangfireDashboard();
 var jobManager = app.Services.GetRequiredService<IRecurringJobManager>();
 jobManager.RemoveIfExists("SupplierService");
 jobManager.AddOrUpdate("SupplierService", new Job(typeof(SupplierWorker).GetMethod(nameof(SupplierWorker.DoWork)), typeof(SupplierWorker)), $"*/{serviceIndex + 1} * * * *");
+jobManager.Trigger("SupplierService");
 
 await app.RunAsync();

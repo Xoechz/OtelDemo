@@ -6,7 +6,6 @@ using Demo.Models.Faker;
 using Demo.Dito.Extensions;
 using Demo.WarehouseService.Config;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace Demo.WarehouseService.Controller;
 
@@ -37,29 +36,31 @@ public class ItemController(ItemRepository itemRepository,
     [HttpPost("add-stock")]
     public async Task AddStockAsync([FromBody] IEnumerable<Item> items)
     {
-        var (acceptedItems, redirectedItems) = SplitItems(items, "AddStock");
-        var redirectTask = RedirectItemsAsync(redirectedItems, "add-stock");
+        var (acceptedItems, redirectedItems) = SplitItems(items, "Checking item for adding");
         var addTask = _itemRepository.AddStockAsync(acceptedItems);
+        var redirectTask = RedirectItemsAsync(redirectedItems, "add-stock");
         await Task.WhenAll(redirectTask, addTask);
     }
 
     [HttpPost("get-items")]
     public async Task<List<Item>> GetItemsAsync([FromBody] IEnumerable<Item> items)
     {
-        var (acceptedItems, redirectedItems) = SplitItems(items, "GetItems");
-
+        var (acceptedItems, redirectedItems) = SplitItems(items, "Checking item for order");
+        var getTask = _itemRepository.GetItemsForOrderAsync(acceptedItems);
         var redirectTask = RedirectItemsAsync(redirectedItems, "get-items");
-        var getTask = _itemRepository.GetItemsFromOrderAsync(acceptedItems);
         await Task.WhenAll(redirectTask, getTask);
 
         var dbItems = getTask.Result;
 
-        if (redirectTask.Result is not null)
+        using (var activity = _activitySource.StartActivity("Merge order results"))
         {
-            var retrievedItems = await redirectTask.Result.Content.ReadFromJsonAsync<List<Item>>();
-            if (retrievedItems is not null)
+            if (redirectTask.Result is not null)
             {
-                dbItems.AddRange(retrievedItems);
+                var retrievedItems = await redirectTask.Result.Content.ReadFromJsonAsync<List<Item>>();
+                if (retrievedItems is not null)
+                {
+                    dbItems.AddRange(retrievedItems);
+                }
             }
         }
 
@@ -77,14 +78,14 @@ public class ItemController(ItemRepository itemRepository,
 
         foreach (var item in items.Deduplicate())
         {
-            var activity = _activitySource.StartEntityActivity(operation, item.ArticleName);
-
             if (_rand.NextDouble() < 0.5)
             {
                 redirectedItems.Add(item);
             }
             else
             {
+                using var activity = _activitySource.StartEntityActivity(operation, item.ArticleName);
+
                 var failure = _failureFaker.Generate();
                 if (failure is not null)
                 {

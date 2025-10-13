@@ -69,5 +69,6 @@ app.MapHangfireDashboard();
 var jobManager = app.Services.GetRequiredService<IRecurringJobManager>();
 jobManager.RemoveIfExists("OrderService");
 jobManager.AddOrUpdate("OrderService", new Job(typeof(OrderWorker).GetMethod(nameof(OrderWorker.DoWork)), typeof(OrderWorker)), $"*/{serviceIndex + 1} * * * *");
+jobManager.Trigger("OrderService");
 
 await app.RunAsync();

@@ -1,8 +1,8 @@
 using System.Text.Json;
 
-const int ORDER_SERVICE_COUNT = 1;
-const int WAREHOUSE_SERVICE_COUNT = 3;
-const int SUPPLIER_SERVICE_COUNT = 1;
+const int ORDER_SERVICE_COUNT = 2;
+const int WAREHOUSE_SERVICE_COUNT = 5;
+const int SUPPLIER_SERVICE_COUNT = 2;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
