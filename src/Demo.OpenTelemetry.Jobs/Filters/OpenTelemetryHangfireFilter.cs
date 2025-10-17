@@ -2,6 +2,7 @@
 using Hangfire.States;
 using Hangfire.Storage;
 using System.Diagnostics;
+using Demo.Dito.Extensions;
 
 namespace Demo.OpenTelemetry.Jobs.Filters;
 
@@ -43,7 +44,7 @@ public class OpenTelemetryHangfireFilter(ActivitySource activitySource) : IApply
         }
 
         var jobName = context.GetJobParameter<string>("RecurringJobId");
-        var activity = _activitySource.StartActivity("HangfireJobPerforming", ActivityKind.Server);
+        var activity = _activitySource.StartJobActivity("HangfireJobExecution", jobName);
 
         if (activity is null)
         {

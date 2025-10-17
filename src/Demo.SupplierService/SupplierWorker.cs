@@ -26,10 +26,7 @@ public class SupplierWorker(ActivitySource activitySource,
     {
         var randomIndex = _rand.Next(0, _config.WarehouseCount);
 
-        using var activity = _activitySource.StartJobActivity("SupplierService.DoWork", "Supplying Items",
-            source: $"WarehouseService-{randomIndex}",
-            destination: $"SupplierService-{_config.ServiceIndex}",
-            entityType: "Item");
+        using var activity = _activitySource.StartActivity("SupplierService.DoWork");
 
         var targetUrl = _config.RedirectionUrls[randomIndex]
             ?? throw new InvalidOperationException("No target URL provided");

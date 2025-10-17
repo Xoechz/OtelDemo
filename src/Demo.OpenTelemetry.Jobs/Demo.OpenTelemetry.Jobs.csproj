@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Demo.OpenTelemetry\Demo.OpenTelemetry.csproj" />
+    <ProjectReference Include="..\Demo.Dito\Demo.Dito.csproj" />
   </ItemGroup>
 
 </Project>
