@@ -3,9 +3,11 @@ using Demo.Dito.Extensions;
 using Demo.Models;
 using Demo.Models.Extensions;
 using Demo.Models.Faker;
+using Demo.OpenTelemetry;
 using Demo.WarehouseService.Config;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 
 namespace Demo.WarehouseService.Controller;
 
@@ -16,12 +18,14 @@ public class ItemController(ItemRepository itemRepository,
                             ILogger<ItemController> logger,
                             ActivitySource activitySource,
                             IHttpClientFactory httpClientFactory,
-                            FailureFaker failureFaker)
+                            FailureFaker failureFaker,
+                            MetricInstrumentCollection instruments)
     : ControllerBase
 {
     #region Private Fields
 
     private readonly ActivitySource _activitySource = activitySource;
+    private readonly MetricInstrumentCollection _instruments = instruments;
     private readonly WarehouseConfig _config = config;
     private readonly FailureFaker _failureFaker = failureFaker;
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient("client");
@@ -93,10 +97,13 @@ public class ItemController(ItemRepository itemRepository,
         List<Item> acceptedItems = [];
         List<Item> redirectedItems = [];
 
+        _instruments.ItemsProcessedHistogram.Record(items.Count(), [new("operation", operation)]);
+
         foreach (var item in items.Deduplicate())
         {
             if (_rand.NextDouble() < 0.5)
             {
+                _instruments.ItemsProcessedCounter.Add(1, new("operation", operation), new("outcome", "redirected"));
                 redirectedItems.Add(item);
             }
             else
@@ -106,11 +113,13 @@ public class ItemController(ItemRepository itemRepository,
                 var failure = _failureFaker.Generate();
                 if (failure is not null)
                 {
+                    _instruments.ItemsProcessedCounter.Add(1, new("operation", operation), new("outcome", "failure"));
                     _logger.LogWarning("Failed operation {Operation} on item {Item} to stock: {Failure}", operation, item.ArticleName, failure);
                     activity?.SetStatus(ActivityStatusCode.Error, failure);
                 }
                 else
                 {
+                    _instruments.ItemsProcessedCounter.Add(1, new("operation", operation), new("outcome", "accepted"));
                     acceptedItems.Add(item);
                     activity?.SetStatus(ActivityStatusCode.Ok, "Item accepted");
                 }

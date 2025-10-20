@@ -54,6 +54,9 @@ public static class ServiceCollectionExtension
         activitySource = new ActivitySource(serviceName);
         services.AddSingleton(activitySource);
 
+        // for manual metric instrumentation
+        services.AddSingleton<MetricInstrumentCollection>();
+
         // OpenTelemetry configuration
         var otelBuilder = services.AddOpenTelemetry()
             // Add the service name to the resource attributes so application insights displays it correctly in the application map
@@ -72,7 +75,9 @@ public static class ServiceCollectionExtension
                     // RuntimeInstrumentation adds metrics for the .NET runtime, such as garbage collection, thread pool usage, etc.
                     .AddRuntimeInstrumentation()
                     // ProcessInstrumentation adds metrics for the process, such as CPU usage, memory usage, etc.
-                    .AddProcessInstrumentation();
+                    .AddProcessInstrumentation()
+                    // Register your custom meter name for export
+                    .AddMeter(serviceName);
             })
             // Tracing is used to collect detailed information about the execution of requests, jobs and other operations in the application.
             .WithTracing(tracing =>
