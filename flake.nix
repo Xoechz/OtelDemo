@@ -20,7 +20,6 @@
 
           DOTNET_BIN = "${pkgs.dotnetCorePackages.sdk_9_0}/bin/dotnet";
           DOTNET_ROOT = "${pkgs.dotnetCorePackages.sdk_9_0}/share/dotnet";
-          LD_LIBRARY_PATH = "/run/current-system/sw/lib";
         };
       };
   };
