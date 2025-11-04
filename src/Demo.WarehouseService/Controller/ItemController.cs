@@ -6,6 +6,7 @@ using Demo.Models.Faker;
 using Demo.OpenTelemetry;
 using Demo.WarehouseService.Config;
 using Microsoft.AspNetCore.Mvc;
+using OpenTelemetry.Trace;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
@@ -32,6 +33,7 @@ public class ItemController(ItemRepository itemRepository,
     private readonly ItemRepository _itemRepository = itemRepository;
     private readonly ILogger<ItemController> _logger = logger;
     private readonly Random _rand = new();
+    private static readonly Dictionary<string, (ActivityTraceId traceId, ActivitySpanId spanId)> _lastOperationPerItem = [];
 
     #endregion Private Fields
 
@@ -109,6 +111,7 @@ public class ItemController(ItemRepository itemRepository,
             else
             {
                 using var activity = _activitySource.StartEntityActivity(operation, item.ArticleName);
+                activity?.SetTag("item.amount", item.Stock);
 
                 var failure = _failureFaker.Generate();
                 if (failure is not null)
@@ -116,12 +119,23 @@ public class ItemController(ItemRepository itemRepository,
                     _instruments.ItemsProcessedCounter.Add(1, new("operation", operation), new("outcome", "failure"));
                     _logger.LogWarning("Failed operation {Operation} on item {Item} to stock: {Failure}", operation, item.ArticleName, failure);
                     activity?.SetStatus(ActivityStatusCode.Error, failure);
+                    activity?.AddEvent(new ActivityEvent("Operation failed", tags: new ActivityTagsCollection { { "failure.reason", failure } }));
                 }
                 else
                 {
                     _instruments.ItemsProcessedCounter.Add(1, new("operation", operation), new("outcome", "accepted"));
                     acceptedItems.Add(item);
                     activity?.SetStatus(ActivityStatusCode.Ok, "Item accepted");
+                }
+
+                if (activity is not null)
+                {
+                    if (_lastOperationPerItem.TryGetValue(item.ArticleName, out var lastOpIds))
+                    {
+                        var link = new ActivityLink(new ActivityContext(lastOpIds.traceId, lastOpIds.spanId, ActivityTraceFlags.None));
+                        activity.AddLink(link);
+                    }
+                    _lastOperationPerItem[item.ArticleName] = (activity.TraceId, activity.SpanId);
                 }
             }
         }
