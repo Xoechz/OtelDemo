@@ -44,8 +44,8 @@ public class ItemController(ItemRepository itemRepository,
     {
         var (acceptedItems, redirectedItems) = SplitItems(items, "Checking item for adding");
         var addTask = _itemRepository.AddStockAsync(acceptedItems);
-        var redirectTask = RedirectItemsAsync(redirectedItems, "add-stock");
-        await Task.WhenAll(redirectTask, addTask);
+        var redirectTasks = RedirectItems(redirectedItems, "add-stock");
+        await Task.WhenAll(Task.WhenAll(redirectTasks), addTask);
     }
 
     [HttpPost("get-items")]
@@ -53,16 +53,16 @@ public class ItemController(ItemRepository itemRepository,
     {
         var (acceptedItems, redirectedItems) = SplitItems(items, "Checking item for order");
         var getTask = _itemRepository.GetItemsForOrderAsync(acceptedItems);
-        var redirectTask = RedirectItemsAsync(redirectedItems, "get-items");
-        await Task.WhenAll(redirectTask, getTask);
+        var redirectTasks = RedirectItems(redirectedItems, "get-items");
+        await Task.WhenAll(Task.WhenAll(redirectTasks), getTask);
 
         var dbItems = getTask.Result;
 
         using (var activity = _activitySource.StartActivity("Merge order results"))
         {
-            if (redirectTask.Result is not null)
+            foreach (var response in redirectTasks)
             {
-                var retrievedItems = await redirectTask.Result.Content.ReadFromJsonAsync<List<Item>>();
+                var retrievedItems = await response.Result.Content.ReadFromJsonAsync<List<Item>>();
                 if (retrievedItems is not null)
                 {
                     dbItems.AddRange(retrievedItems);
@@ -77,21 +77,31 @@ public class ItemController(ItemRepository itemRepository,
 
     #region Private Methods
 
-    private async Task<HttpResponseMessage?> RedirectItemsAsync(List<Item> items, string operation)
+    private int GetRedirectionIndex()
     {
-        if (items.Count == 0)
+        var redirectIndex = _rand.Next(_config.WarehouseCount);
+        return redirectIndex == _config.ServiceIndex ? (redirectIndex + 1) % _config.WarehouseCount : redirectIndex;
+    }
+
+    private List<Task<HttpResponseMessage>> RedirectItems(List<Item> items, string operation)
+    {
+        List<Task<HttpResponseMessage>> responses = [];
+
+        var redirections = items
+            .GroupBy(item => GetRedirectionIndex())
+            .Where(g => g.Any())
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        foreach (var (redirectIndex, redirectedItems) in redirections)
         {
-            return null;
+            var redirectUrl = _config.RedirectionUrls[redirectIndex];
+            _logger.LogWarning("Redirecting {Count} items to WarehouseService-{RedirectIndex} for operation {Operation}", redirectedItems.Count, redirectIndex, operation);
+
+            responses.Add(_httpClient.PostAsJsonAsync($"{redirectUrl}/item/{operation}", redirectedItems)
+                .ContinueWith(t => t.Result.EnsureSuccessStatusCode()));
         }
 
-        var redirectIndex = _rand.Next(_config.WarehouseCount);
-        redirectIndex = redirectIndex == _config.ServiceIndex ? (redirectIndex + 1) % _config.WarehouseCount : redirectIndex;
-        var redirectUrl = _config.RedirectionUrls[redirectIndex];
-        _logger.LogWarning("Redirecting {Count} items to WarehouseService-{RedirectIndex} for operation {Operation}", items.Count, redirectIndex, operation);
-
-        var response = await _httpClient.PostAsJsonAsync($"{redirectUrl}/item/{operation}", items);
-        response.EnsureSuccessStatusCode();
-        return response;
+        return responses;
     }
 
     private (List<Item>, List<Item>) SplitItems(IEnumerable<Item> items, string operation)
