@@ -14,12 +14,13 @@
         default = pkgs.mkShell {
           name = "dotnet";
           nativeBuildInputs = with pkgs; [
-            dotnetCorePackages.sdk_9_0
+            dotnetCorePackages.sdk_10_0
             libmsquic
           ];
 
-          DOTNET_BIN = "${pkgs.dotnetCorePackages.sdk_9_0}/bin/dotnet";
-          DOTNET_ROOT = "${pkgs.dotnetCorePackages.sdk_9_0}/share/dotnet";
+          DOTNET_BIN = "${pkgs.dotnetCorePackages.sdk_10_0}/bin/dotnet";
+          DOTNET_ROOT = "${pkgs.dotnetCorePackages.sdk_10_0}/share/dotnet";
+          DOTNET_DEFAULT_PROJECT_PATH = "/home/elias/Repos/DITO/OtelDemo/src/Demo.AppHost/Demo.AppHost.csproj";
         };
       };
   };

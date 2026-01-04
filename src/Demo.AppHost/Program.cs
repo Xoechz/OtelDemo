@@ -8,6 +8,12 @@ const string OTEL_COLLECTOR_ENDPOINT = "http://localhost:4317";
 
 var builder = DistributedApplication.CreateBuilder(args);
 
+builder.AddContainer("lgtm", "grafana/otel-lgtm")
+    .WithIconName("Eye")
+    .WithEndpoint(24317, 4317, "http", "otel-grpc") // OTLP gRPC
+    .WithEndpoint(24318, 4318, "http", "otel-http") // OTLP HTTP
+    .WithEndpoint(3000, 3000, "http", "grafana-ui"); // Grafana UI
+
 var sql = builder.AddSqlServer("sql")
     .WithLifetime(ContainerLifetime.Persistent)
     .WithDataVolume();

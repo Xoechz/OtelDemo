@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <!--Improve performance on my rather weak machine by only running analyzers during build-->
+    <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <!-- CA1000 Ignore rule concerning static members on generic types, because static factory methods are essential to the Creatable classes -->
+    <!-- CA1707 Ignore naming rule concerning underscores in member names, because test methods and constants should use them IMO -->
+    <!-- CA1848 Ignore rule concerning logging with delegates, because the performance impact is negligible for our use case and it harms readability -->
+    <NoWarn>CA1000,CA1707,CA1848</NoWarn>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+</Project>
