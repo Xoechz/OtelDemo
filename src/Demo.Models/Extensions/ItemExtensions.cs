@@ -2,7 +2,7 @@ namespace Demo.Models.Extensions;
 
 public static class ItemExtensions
 {
-    #region Public Methods
+    #region public methods
 
     public static IEnumerable<Item> Deduplicate(this IEnumerable<Item> orders)
     {
@@ -11,5 +11,5 @@ public static class ItemExtensions
             .Select(g => new Item(g.Key, g.Sum(o => o.Stock)));
     }
 
-    #endregion Public Methods
+    #endregion 
 }

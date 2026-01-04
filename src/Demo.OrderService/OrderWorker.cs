@@ -1,8 +1,8 @@
-﻿using Demo.Data.Entities;
+using System.Diagnostics;
+using Demo.Data.Entities;
 using Demo.Dito.Extensions;
 using Demo.Models.Faker;
 using Demo.OrderService.Config;
-using System.Diagnostics;
 
 namespace Demo.OrderService;
 
@@ -11,17 +11,7 @@ public class OrderWorker(ActivitySource activitySource,
                          ItemFaker itemFaker,
                          IHttpClientFactory httpClientFactory)
 {
-    #region Private Fields
-
-    private readonly ActivitySource _activitySource = activitySource;
-    private readonly OrderConfig _config = config;
-    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("client");
-    private readonly ItemFaker _jobFaker = itemFaker;
-    private readonly Random _rand = new();
-
-    #endregion Private Fields
-
-    #region Public Methods
+    #region public methods
 
     public async Task DoWork(CancellationToken cancellationToken)
     {
@@ -49,5 +39,13 @@ public class OrderWorker(ActivitySource activitySource,
         activity?.SetTag("item.retrieved.total", items.Sum(i => i.Stock));
     }
 
-    #endregion Public Methods
+    #endregion 
+
+    #region private fields
+    private readonly ActivitySource _activitySource = activitySource;
+    private readonly OrderConfig _config = config;
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("client");
+    private readonly ItemFaker _jobFaker = itemFaker;
+    private readonly Random _rand = new();
+    #endregion 
 }

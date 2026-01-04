@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace Demo.Data;
 
-internal class DesignTimeDemoContextFactory : IDesignTimeDbContextFactory<DemoContext>
+internal sealed class DesignTimeDemoContextFactory : IDesignTimeDbContextFactory<DemoContext>
 {
-    #region Public Methods
+    #region public methods
 
     public DemoContext CreateDbContext(string[] args)
     {
@@ -14,5 +14,5 @@ internal class DesignTimeDemoContextFactory : IDesignTimeDbContextFactory<DemoCo
         return new DemoContext(optionsBuilder.Options);
     }
 
-    #endregion Public Methods
+    #endregion 
 }

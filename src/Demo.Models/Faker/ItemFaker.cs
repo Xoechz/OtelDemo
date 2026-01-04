@@ -4,16 +4,16 @@ namespace Demo.Models.Faker;
 
 public class ItemFaker : Faker<Item>
 {
-    #region Public Constructors
+    #region public constructors
 
     public ItemFaker(int seed)
     {
         ConfigureOrderFaker(seed);
     }
 
-    #endregion Public Constructors
+    #endregion 
 
-    #region Private Methods
+    #region private methods
 
     private void ConfigureOrderFaker(int seed)
     {
@@ -21,5 +21,5 @@ public class ItemFaker : Faker<Item>
             .CustomInstantiator(f => new(f.Commerce.Product(), f.Random.Int(1, 20)));
     }
 
-    #endregion Private Methods
+    #endregion 
 }

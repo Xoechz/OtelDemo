@@ -1,21 +1,18 @@
-﻿namespace Demo.Models;
+namespace Demo.Models;
 
 public class Item(string articleName, int stock)
 {
-    #region Public Properties
-
+    #region public properties
     public string ArticleName { get; set; } = articleName;
-
     public int Stock { get; set; } = stock;
+    #endregion 
 
-    #endregion Public Properties
-
-    #region Public Methods
+    #region public methods
 
     public override string ToString()
     {
         return $"{ArticleName} ({Stock})";
     }
 
-    #endregion Public Methods
+    #endregion 
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Demo.Data.Repositories;
 using Demo.Dito.Extensions;
 using Demo.Models;
@@ -6,9 +7,6 @@ using Demo.Models.Faker;
 using Demo.OpenTelemetry;
 using Demo.WarehouseService.Config;
 using Microsoft.AspNetCore.Mvc;
-using OpenTelemetry.Trace;
-using System.Diagnostics;
-using System.Diagnostics.Metrics;
 
 namespace Demo.WarehouseService.Controller;
 
@@ -20,24 +18,10 @@ public class ItemController(ItemRepository itemRepository,
                             ActivitySource activitySource,
                             IHttpClientFactory httpClientFactory,
                             FailureFaker failureFaker,
-                            MetricInstrumentCollection instruments)
+                            MetricInstruments instruments)
     : ControllerBase
 {
-    #region Private Fields
-
-    private readonly ActivitySource _activitySource = activitySource;
-    private readonly MetricInstrumentCollection _instruments = instruments;
-    private readonly WarehouseConfig _config = config;
-    private readonly FailureFaker _failureFaker = failureFaker;
-    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("client");
-    private readonly ItemRepository _itemRepository = itemRepository;
-    private readonly ILogger<ItemController> _logger = logger;
-    private readonly Random _rand = new();
-    private static readonly Dictionary<string, (ActivityTraceId traceId, ActivitySpanId spanId)> _lastOperationPerItem = [];
-
-    #endregion Private Fields
-
-    #region Public Methods
+    #region public methods
 
     [HttpPost("add-stock")]
     public async Task AddStockAsync([FromBody] IEnumerable<Item> items)
@@ -73,9 +57,21 @@ public class ItemController(ItemRepository itemRepository,
         return dbItems;
     }
 
-    #endregion Public Methods
+    #endregion 
 
-    #region Private Methods
+    #region private fields
+    private readonly ActivitySource _activitySource = activitySource;
+    private readonly WarehouseConfig _config = config;
+    private readonly FailureFaker _failureFaker = failureFaker;
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("client");
+    private readonly MetricInstruments _instruments = instruments;
+    private readonly ItemRepository _itemRepository = itemRepository;
+    private static readonly Dictionary<string, (ActivityTraceId traceId, ActivitySpanId spanId)> _lastOperationPerItem = [];
+    private readonly ILogger<ItemController> _logger = logger;
+    private readonly Random _rand = new();
+    #endregion 
+
+    #region private methods
 
     private int GetRedirectionIndex()
     {
@@ -153,5 +149,5 @@ public class ItemController(ItemRepository itemRepository,
         return (acceptedItems, redirectedItems);
     }
 
-    #endregion Private Methods
+    #endregion 
 }

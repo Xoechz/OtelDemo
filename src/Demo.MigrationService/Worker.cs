@@ -1,10 +1,10 @@
+using System.Diagnostics;
 using Demo.Data;
 using Demo.Models.Extensions;
 using Demo.Models.Faker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
-using System.Diagnostics;
 
 namespace Demo.MigrationService;
 
@@ -14,16 +14,7 @@ public class Worker(IServiceProvider serviceProvider,
                     ActivitySource activitySource)
     : BackgroundService
 {
-    #region Private Fields
-
-    private readonly ActivitySource _activitySource = activitySource;
-    private readonly IHostApplicationLifetime _hostApplicationLifetime = hostApplicationLifetime;
-    private readonly ItemFaker _orderFaker = orderFaker;
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-
-    #endregion Private Fields
-
-    #region Protected Methods
+    #region protected methods
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -47,9 +38,16 @@ public class Worker(IServiceProvider serviceProvider,
         _hostApplicationLifetime.StopApplication();
     }
 
-    #endregion Protected Methods
+    #endregion 
 
-    #region Private Methods
+    #region private fields
+    private readonly ActivitySource _activitySource = activitySource;
+    private readonly IHostApplicationLifetime _hostApplicationLifetime = hostApplicationLifetime;
+    private readonly ItemFaker _orderFaker = orderFaker;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
+    #endregion 
+
+    #region private methods
 
     private static async Task EnsureDatabaseAsync(DbContext dbContext, CancellationToken cancellationToken)
     {
@@ -95,5 +93,5 @@ public class Worker(IServiceProvider serviceProvider,
         });
     }
 
-    #endregion Private Methods
+    #endregion 
 }

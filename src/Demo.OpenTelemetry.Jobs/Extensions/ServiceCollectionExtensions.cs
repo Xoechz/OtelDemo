@@ -1,4 +1,4 @@
-﻿using Demo.OpenTelemetry.Extensions;
+using Demo.OpenTelemetry.Extensions;
 using Demo.OpenTelemetry.Jobs.Filters;
 using Hangfire;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +12,7 @@ namespace Demo.OpenTelemetry.Jobs.Extensions;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
-    #region Public Methods
+    #region public methods
 
     /// <summary>
     /// Configures OpenTelemetry and adds Hangfire failure tracing for OpenTelemetry.
@@ -34,5 +34,5 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    #endregion Public Methods
+    #endregion 
 }

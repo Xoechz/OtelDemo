@@ -4,7 +4,13 @@ namespace Demo.WarehouseService.Config;
 
 public class WarehouseConfig
 {
-    #region Public Constructors
+    #region public properties
+    public ReadOnlyDictionary<int, string> RedirectionUrls { get; }
+    public int ServiceIndex { get; }
+    public int WarehouseCount { get; }
+    #endregion 
+
+    #region public constructors
 
     public WarehouseConfig(int serviceIndex, int warehouseCount, IDictionary<int, string> redirectionUris)
     {
@@ -14,15 +20,5 @@ public class WarehouseConfig
         RedirectionUrls = new ReadOnlyDictionary<int, string>(redirectionUris);
     }
 
-    #endregion Public Constructors
-
-    #region Public Properties
-
-    public ReadOnlyDictionary<int, string> RedirectionUrls { get; }
-
-    public int ServiceIndex { get; }
-
-    public int WarehouseCount { get; }
-
-    #endregion Public Properties
+    #endregion 
 }

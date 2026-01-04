@@ -1,7 +1,6 @@
-﻿using Demo.Dito.Extensions;
+using System.Diagnostics;
 using Demo.Models.Faker;
 using Demo.SupplierService.Config;
-using System.Diagnostics;
 
 namespace Demo.SupplierService;
 
@@ -10,17 +9,7 @@ public class SupplierWorker(ActivitySource activitySource,
                          ItemFaker itemFaker,
                          IHttpClientFactory httpClientFactory)
 {
-    #region Private Fields
-
-    private readonly ActivitySource _activitySource = activitySource;
-    private readonly SupplierConfig _config = config;
-    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("client");
-    private readonly ItemFaker _jobFaker = itemFaker;
-    private readonly Random _rand = new();
-
-    #endregion Private Fields
-
-    #region Public Methods
+    #region public methods
 
     public async Task DoWork(CancellationToken cancellationToken)
     {
@@ -39,5 +28,13 @@ public class SupplierWorker(ActivitySource activitySource,
         response.EnsureSuccessStatusCode();
     }
 
-    #endregion Public Methods
+    #endregion 
+
+    #region private fields
+    private readonly ActivitySource _activitySource = activitySource;
+    private readonly SupplierConfig _config = config;
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("client");
+    private readonly ItemFaker _jobFaker = itemFaker;
+    private readonly Random _rand = new();
+    #endregion 
 }

@@ -1,3 +1,4 @@
+using System.Net;
 using Demo.Data;
 using Demo.Data.Repositories;
 using Demo.Models.Faker;
@@ -5,7 +6,6 @@ using Demo.ServiceDefaults;
 using Demo.WarehouseService.Config;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 

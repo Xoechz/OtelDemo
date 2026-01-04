@@ -1,10 +1,19 @@
-﻿using Bogus;
+using Bogus;
 
 namespace Demo.Models.Faker;
 
 public class FailureFaker : Faker<string?>
 {
-    #region Private Fields
+    #region public constructors
+
+    public FailureFaker(int seed)
+    {
+        ConfigureFailureFaker(seed);
+    }
+
+    #endregion 
+
+    #region private fields
 
     private readonly List<string> _errorMessages =
     [
@@ -15,18 +24,9 @@ public class FailureFaker : Faker<string?>
         "Item not deliverable, due to personal grudge against customer",
     ];
 
-    #endregion Private Fields
+    #endregion 
 
-    #region Public Constructors
-
-    public FailureFaker(int seed)
-    {
-        ConfigureFailureFaker(seed);
-    }
-
-    #endregion Public Constructors
-
-    #region Private Methods
+    #region private methods
 
     private void ConfigureFailureFaker(int seed)
     {
@@ -38,5 +38,5 @@ public class FailureFaker : Faker<string?>
             });
     }
 
-    #endregion Private Methods
+    #endregion 
 }

@@ -1,4 +1,5 @@
-﻿using Azure.Monitor.OpenTelemetry.Exporter;
+using System.Diagnostics;
+using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -7,7 +8,6 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using System.Diagnostics;
 
 namespace Demo.OpenTelemetry.Extensions;
 
@@ -16,14 +16,7 @@ namespace Demo.OpenTelemetry.Extensions;
 /// </summary>
 public static class ServiceCollectionExtension
 {
-    #region Private Fields
-
-    private const string APP_INSIGHTS_CONFIG = "APPLICATIONINSIGHTS_CONNECTION_STRING";
-    private const string OTEL_CONFIG = "OTEL_EXPORTER_OTLP_ENDPOINT";
-
-    #endregion Private Fields
-
-    #region Public Methods
+    #region public methods
 
     /// <summary>
     /// My way of OpenTelemetry configuration.
@@ -55,7 +48,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton(activitySource);
 
         // for manual metric instrumentation
-        services.AddSingleton<MetricInstrumentCollection>();
+        services.AddSingleton<MetricInstruments>();
 
         // OpenTelemetry configuration
         var otelBuilder = services.AddOpenTelemetry()
@@ -122,5 +115,10 @@ public static class ServiceCollectionExtension
         return services;
     }
 
-    #endregion Public Methods
+    #endregion 
+
+    #region private constants
+    private const string APP_INSIGHTS_CONFIG = "APPLICATIONINSIGHTS_CONNECTION_STRING";
+    private const string OTEL_CONFIG = "OTEL_EXPORTER_OTLP_ENDPOINT";
+    #endregion 
 }

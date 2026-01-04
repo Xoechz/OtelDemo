@@ -1,8 +1,8 @@
-﻿using Hangfire.Server;
-using Hangfire.States;
-using Hangfire.Storage;
 using System.Diagnostics;
 using Demo.Dito.Extensions;
+using Hangfire.Server;
+using Hangfire.States;
+using Hangfire.Storage;
 
 namespace Demo.OpenTelemetry.Jobs.Filters;
 
@@ -13,14 +13,7 @@ namespace Demo.OpenTelemetry.Jobs.Filters;
 /// <param name="activitySource"><see cref="ActivitySource"/> to create an OpenTelemetry Trace</param>
 public class OpenTelemetryHangfireFilter(ActivitySource activitySource) : IApplyStateFilter, IServerFilter
 {
-    #region Private Fields
-
-    private readonly Dictionary<string, Activity> _activities = [];
-    private readonly ActivitySource _activitySource = activitySource;
-
-    #endregion Private Fields
-
-    #region Public Methods
+    #region public methods
 
     /// <inheritdoc/>
     public void OnPerformed(PerformedContext context)
@@ -98,5 +91,10 @@ public class OpenTelemetryHangfireFilter(ActivitySource activitySource) : IApply
         // No action needed when state is unapplied
     }
 
-    #endregion Public Methods
+    #endregion 
+
+    #region private fields
+    private readonly Dictionary<string, Activity> _activities = [];
+    private readonly ActivitySource _activitySource = activitySource;
+    #endregion 
 }

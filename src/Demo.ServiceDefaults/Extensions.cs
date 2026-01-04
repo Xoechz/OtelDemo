@@ -12,7 +12,7 @@ namespace Demo.ServiceDefaults;
 // To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
 public static class Extensions
 {
-    #region Public Methods
+    #region public methods
 
     public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
@@ -62,5 +62,5 @@ public static class Extensions
         return app;
     }
 
-    #endregion Public Methods
+    #endregion 
 }

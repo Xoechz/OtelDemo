@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Demo.Data.Entities;
 
 public class Item
 {
-    #region Public Properties
+    #region public properties
 
     [Key, MaxLength(50)]
     public required string ArticleName { get; set; }
@@ -12,5 +12,5 @@ public class Item
     [Required]
     public required int Stock { get; set; }
 
-    #endregion Public Properties
+    #endregion 
 }

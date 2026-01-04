@@ -1,9 +1,9 @@
-﻿using Demo.Dito.Extensions;
+using System.Diagnostics;
+using Demo.Dito.Extensions;
 using Demo.Models;
 using Demo.Models.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
 namespace Demo.Data.Repositories;
 
@@ -11,15 +11,7 @@ public class ItemRepository(DemoContext demoContext,
                             ActivitySource activitySource,
                             ILogger<ItemRepository> logger)
 {
-    #region Private Fields
-
-    private readonly ActivitySource _activitySource = activitySource;
-    private readonly DemoContext _context = demoContext;
-    private readonly ILogger<ItemRepository> _logger = logger;
-
-    #endregion Private Fields
-
-    #region Public Methods
+    #region public methods
 
     public async Task AddStockAsync(List<Models.Item> items)
     {
@@ -99,5 +91,11 @@ public class ItemRepository(DemoContext demoContext,
         return result;
     }
 
-    #endregion Public Methods
+    #endregion 
+
+    #region private fields
+    private readonly ActivitySource _activitySource = activitySource;
+    private readonly DemoContext _context = demoContext;
+    private readonly ILogger<ItemRepository> _logger = logger;
+    #endregion 
 }

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Demo.Dito.Extensions;
 
@@ -7,18 +7,7 @@ namespace Demo.Dito.Extensions;
 /// </summary>
 public static class ActivitySourceExtensions
 {
-    #region Private Fields
-
-    private const string DESTINATION = "dito.destination";
-    private const string ENTITY_KEY = "dito.key";
-    private const string ENTITY_TYPE = "dito.entity_type";
-    private const string JOB_ID = "dito.job_id";
-    private const string JOB_SPAN_ID = "dito.job_span_id";
-    private const string SOURCE = "dito.source";
-
-    #endregion Private Fields
-
-    #region Public Methods
+    #region public methods
 
     /// <summary>
     /// Starts an activity for a specific entity, propagating the job span ID if available.
@@ -83,5 +72,14 @@ public static class ActivitySourceExtensions
         return activity;
     }
 
-    #endregion Public Methods
+    #endregion 
+
+    #region private constants
+    private const string DESTINATION = "dito.destination";
+    private const string ENTITY_KEY = "dito.key";
+    private const string ENTITY_TYPE = "dito.entity_type";
+    private const string JOB_ID = "dito.job_id";
+    private const string JOB_SPAN_ID = "dito.job_span_id";
+    private const string SOURCE = "dito.source";
+    #endregion 
 }
