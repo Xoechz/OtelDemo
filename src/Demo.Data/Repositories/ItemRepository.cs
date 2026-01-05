@@ -45,7 +45,7 @@ public class ItemRepository(DemoContext demoContext,
         await _context.SaveChangesAsync();
     }
 
-    public async Task<List<Models.Item>> GetItemsForOrderAsync(IEnumerable<Models.Item> items)
+    public async Task<List<Item>> GetItemsForOrderAsync(IEnumerable<Item> items)
     {
         using var activity = _activitySource.StartActivity("Get items for order");
         List<Item> result = [];

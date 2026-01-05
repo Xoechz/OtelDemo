@@ -30,8 +30,8 @@ public sealed class MetricInstruments
         var serviceName = configuration["SERVICE_NAME"] ?? environment.ApplicationName;
 
         var meter = meterFactory.Create(serviceName);
-        ItemsProcessedCounter = meter.CreateCounter<int>("items_processed_total", "items", "Total number of items processed");
-        ItemsProcessedHistogram = meter.CreateHistogram<int>("items_processed_histogram", "items", "Histogram of items processed per request");
+        ItemsProcessedCounter = meter.CreateCounter<int>("items.processed_total", "items", "Total number of items processed");
+        ItemsProcessedHistogram = meter.CreateHistogram<int>("items.processed", "items", "Histogram of items processed per request");
     }
 
     #endregion 
