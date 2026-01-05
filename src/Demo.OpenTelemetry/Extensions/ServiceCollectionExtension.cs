@@ -59,8 +59,10 @@ public static class ServiceCollectionExtension
             // Metrics are used to collect performance data, such as request duration, memory usage, etc.
             .WithMetrics(metrics =>
             {
-                // AspNetCoreInstrumentation adds general metrics for ASP.NET Core applications such as request duration, request count, etc.
-                metrics.AddAspNetCoreInstrumentation()
+                // Register your custom meter name for export
+                metrics.AddMeter(serviceName)
+                    // AspNetCoreInstrumentation adds general metrics for ASP.NET Core applications such as request duration, request count, etc.
+                    .AddAspNetCoreInstrumentation()
                     // HttpClientInstrumentation adds metrics for outgoing HTTP requests made by the application.
                     .AddHttpClientInstrumentation()
                     // SqlClientInstrumentation adds metrics for SQL database operations.
@@ -68,9 +70,7 @@ public static class ServiceCollectionExtension
                     // RuntimeInstrumentation adds metrics for the .NET runtime, such as garbage collection, thread pool usage, etc.
                     .AddRuntimeInstrumentation()
                     // ProcessInstrumentation adds metrics for the process, such as CPU usage, memory usage, etc.
-                    .AddProcessInstrumentation()
-                    // Register your custom meter name for export
-                    .AddMeter(serviceName);
+                    .AddProcessInstrumentation();
             })
             // Tracing is used to collect detailed information about the execution of requests, jobs and other operations in the application.
             .WithTracing(tracing =>
@@ -87,8 +87,7 @@ public static class ServiceCollectionExtension
                     // EntityFrameworkCoreInstrumentation adds tracing for Entity Framework Core operations, such as database queries and commands.
                     // Node: The SqlClientInstrumentation is not included, because we do not really use raw SQL commands, but hangfire uses them fairly often, which is not relevant.
                     // Also the EntityFramework Traces would be duplicated.
-                    // The DB statements are captured to see which SQL commands are executed.
-                    .AddEntityFrameworkCoreInstrumentation(o => o.SetDbStatementForText = true)
+                    .AddEntityFrameworkCoreInstrumentation()
                     // HttpClientInstrumentation adds tracing for outgoing HTTP requests made by the application.
                     .AddHttpClientInstrumentation();
             });
