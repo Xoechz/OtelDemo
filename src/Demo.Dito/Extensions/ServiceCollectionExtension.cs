@@ -24,11 +24,17 @@ public static class ActivitySourceExtensions
         {
             activity.SetTag(ENTITY_KEY, entityKey);
             activity.DisplayName = $"{name} - {entityKey}";
-            var baggageValue = activity.GetBaggageItem(JOB_SPAN_ID);
+            var jobSpanId = activity.GetBaggageItem(JOB_SPAN_ID);
+            var entityType = activity.GetBaggageItem(ENTITY_TYPE);
 
-            if (baggageValue != null)
+            if (jobSpanId != null)
             {
-                activity.AddTag(JOB_SPAN_ID, baggageValue);
+                activity.AddTag(JOB_SPAN_ID, jobSpanId);
+            }
+
+            if (entityType != null)
+            {
+                activity.AddTag(ENTITY_TYPE, entityType);
             }
         }
 
@@ -66,6 +72,7 @@ public static class ActivitySourceExtensions
             if (entityType != null)
             {
                 activity.SetTag(ENTITY_TYPE, entityType);
+                activity.AddBaggage(ENTITY_TYPE, entityType);
             }
         }
 

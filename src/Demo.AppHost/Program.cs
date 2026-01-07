@@ -15,17 +15,8 @@ builder.AddContainer("lgtm", "grafana/otel-lgtm")
     .WithEndpoint(24318, 4318, "http", "otel-http")
     .WithEndpoint(3000, 3000, "http", "grafana-ui");
 
-// There is currently an issue that the collector cannot send telemetry to the apphost, so only grafana is receiving telemetry.
-var dito = builder.AddContainer("dito", "xoechz/dito")
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithIconName("ShowGrid")
-    .WithEndpoint(4317, 4317, "http", "otel-grpc")
-    .WithEndpoint(4318, 4318, "http", "otel-http")
-    .WithEndpoint(13133, 13133, "http", "health-check")
-    .WithEndpoint(55679, 55679, "http", "zpages")
-    .WithEndpoint(1777, 1777, "http", "pprof")
-    .WithHttpHealthCheck(endpointName: "health-check");
-
+// A local instance of the collector has to run. If its in a container it wont work with aspire, because the 
+// telemetry data is not correctly sent out of the container network.
 var sql = builder.AddSqlServer("sql")
     .WithLifetime(ContainerLifetime.Persistent)
     .WithDataVolume();
