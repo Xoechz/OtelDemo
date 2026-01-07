@@ -1,0 +1,504 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 0,
+    "links": [],
+    "panels": [
+        {
+            "datasource": {
+                "type": "loki",
+                "uid": "loki"
+            },
+            "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 15,
+                "w": 8,
+                "x": 0,
+                "y": 0
+            },
+            "id": 4,
+            "options": {
+                "dedupStrategy": "none",
+                "enableInfiniteScrolling": false,
+                "enableLogDetails": true,
+                "prettifyLogMessage": false,
+                "showCommonLabels": false,
+                "showControls": false,
+                "showLabels": false,
+                "showTime": true,
+                "sortOrder": "Descending",
+                "wrapLogMessage": false
+            },
+            "pluginVersion": "12.3.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "loki",
+                        "uid": "loki"
+                    },
+                    "direction": "backward",
+                    "editorMode": "code",
+                    "expr": "{service_name=\"$ServiceName\"} | logfmt | __error__=``",
+                    "queryType": "range",
+                    "refId": "A"
+                }
+            ],
+            "title": "Logs",
+            "type": "logs"
+        },
+        {
+            "datasource": {
+                "type": "tempo",
+                "uid": "tempo"
+            },
+            "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 15,
+                "w": 8,
+                "x": 8,
+                "y": 0
+            },
+            "id": 3,
+            "options": {
+                "edges": {},
+                "layoutAlgorithm": "layered",
+                "nodes": {},
+                "zoomMode": "cooperative"
+            },
+            "pluginVersion": "12.3.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "tempo",
+                        "uid": "tempo"
+                    },
+                    "filters": [
+                        {
+                            "id": "8b200a1e",
+                            "operator": "=",
+                            "scope": "span"
+                        }
+                    ],
+                    "hide": false,
+                    "limit": 1,
+                    "metricsQueryType": "range",
+                    "query": "{}",
+                    "queryType": "serviceMap",
+                    "refId": "A",
+                    "serviceMapUseNativeHistograms": false,
+                    "tableType": "traces"
+                }
+            ],
+            "title": "Service Map",
+            "type": "nodeGraph"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "barWidthFactor": 0.6,
+                        "drawStyle": "line",
+                        "fillOpacity": 0,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "showValues": false,
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 15,
+                "w": 8,
+                "x": 16,
+                "y": 0
+            },
+            "id": 5,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "hideZeros": false,
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "12.3.0",
+            "targets": [
+                {
+                    "editorMode": "builder",
+                    "expr": "avg by(service_name) (http_server_request_duration_seconds_bucket)",
+                    "legendFormat": "__auto",
+                    "range": true,
+                    "refId": "A"
+                }
+            ],
+            "title": "Http request duration",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "tempo",
+                "uid": "tempo"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "footer": {
+                            "reducers": []
+                        },
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Trace ID"
+                        },
+                        "properties": [
+                            {
+                                "id": "custom.width",
+                                "value": 297
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 15
+            },
+            "id": 1,
+            "options": {
+                "cellHeight": "sm",
+                "showHeader": true
+            },
+            "pluginVersion": "12.3.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "tempo",
+                        "uid": "tempo"
+                    },
+                    "limit": 20,
+                    "metricsQueryType": "range",
+                    "query": "{}",
+                    "queryType": "traceql",
+                    "refId": "A",
+                    "serviceMapUseNativeHistograms": false,
+                    "tableType": "traces"
+                }
+            ],
+            "title": "All Traces",
+            "type": "table"
+        },
+        {
+            "datasource": {
+                "type": "tempo",
+                "uid": "tempo"
+            },
+            "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 16,
+                "w": 12,
+                "x": 12,
+                "y": 15
+            },
+            "id": 6,
+            "options": {
+                "spanFilters": {
+                    "criticalPathOnly": false,
+                    "matchesOnly": false,
+                    "serviceNameOperator": "=",
+                    "spanNameOperator": "=",
+                    "tags": [
+                        {
+                            "id": "1ace4f93-e4c",
+                            "operator": "="
+                        }
+                    ]
+                }
+            },
+            "pluginVersion": "12.3.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "tempo",
+                        "uid": "tempo"
+                    },
+                    "limit": 20,
+                    "metricsQueryType": "range",
+                    "query": "${ExampleTraceId}",
+                    "queryType": "traceql",
+                    "refId": "A",
+                    "serviceMapUseNativeHistograms": false,
+                    "tableType": "traces"
+                }
+            ],
+            "title": "Example Trace",
+            "type": "traces"
+        },
+        {
+            "datasource": {
+                "type": "tempo",
+                "uid": "tempo"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "fillOpacity": 50,
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "pointShape": "circle",
+                        "pointSize": {
+                            "fixed": 10
+                        },
+                        "pointStrokeWidth": 1,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "show": "points"
+                    },
+                    "links": [
+                        {
+                            "targetBlank": true,
+                            "title": "Explore Trace",
+                            "url": "http://localhost:3000/explore?left=%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22query%22%3A%22${__data.fields.traceIdHidden}%22%2C%22queryType%22%3A%22traceql%22%7D%5D%7D"
+                        }
+                    ],
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 23
+            },
+            "id": 2,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "mapping": "auto",
+                "series": [
+                    {
+                        "x": {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "Start time"
+                            }
+                        },
+                        "y": {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "Duration"
+                            }
+                        }
+                    }
+                ],
+                "tooltip": {
+                    "hideZeros": false,
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "12.3.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "tempo",
+                        "uid": "tempo"
+                    },
+                    "limit": 20,
+                    "metricsQueryType": "range",
+                    "query": "{}",
+                    "queryType": "traceql",
+                    "refId": "A",
+                    "serviceMapUseNativeHistograms": false,
+                    "tableType": "spans"
+                }
+            ],
+            "title": "Span Durations",
+            "type": "xychart"
+        }
+    ],
+    "preload": false,
+    "schemaVersion": 42,
+    "tags": [],
+    "templating": {
+        "list": [
+            {
+                "current": {
+                    "text": "Migration-0",
+                    "value": "Migration-0"
+                },
+                "datasource": {
+                    "type": "loki",
+                    "uid": "loki"
+                },
+                "definition": "",
+                "label": "Service Name",
+                "name": "ServiceName",
+                "options": [],
+                "query": {
+                    "label": "service_name",
+                    "refId": "LokiVariableQueryEditor-VariableQuery",
+                    "stream": "",
+                    "type": 1
+                },
+                "refresh": 1,
+                "regex": "",
+                "type": "query"
+            },
+            {
+                "current": {
+                    "text": "ff141435626bcc1c3bc2470823496dc0",
+                    "value": "ff141435626bcc1c3bc2470823496dc0"
+                },
+                "label": "Example TraceId",
+                "name": "ExampleTraceId",
+                "options": [],
+                "query": "",
+                "type": "custom"
+            }
+        ]
+    },
+    "time": {
+        "from": "now-15m",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "OTEL Trace Centric",
+    "uid": "adbcfgn",
+    "version": 2
+}
