@@ -38,6 +38,9 @@ public static class ServiceCollectionExtension
     /// <returns><see cref="IServiceCollection"/> for method chaining</returns>
     public static IServiceCollection ConfigureOpenTelemetry(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment, out ActivitySource activitySource)
     {
+        // The pre W3C propagator is needed because the current baggage implementation is buggy in .NET 10
+        DistributedContextPropagator.Current = DistributedContextPropagator.CreatePreW3CPropagator();
+
         var serviceName = configuration["SERVICE_NAME"] ?? environment.ApplicationName;
 
         // for manual trace instrumentation

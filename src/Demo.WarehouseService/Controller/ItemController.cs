@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 using Demo.Data.Repositories;
 using Demo.Dito.Extensions;
 using Demo.Models;
@@ -28,8 +29,8 @@ public class ItemController(ItemRepository itemRepository,
     {
         var (acceptedItems, redirectedItems) = SplitItems(items, "Checking item for adding");
         var addTask = _itemRepository.AddStockAsync(acceptedItems);
-        var redirectTasks = RedirectItems(redirectedItems, "add-stock");
-        await Task.WhenAll(Task.WhenAll(redirectTasks), addTask);
+        var redirectTask = RedirectItems(redirectedItems, "add-stock");
+        await Task.WhenAll(redirectTask, addTask);
     }
 
     [HttpPost("get-items")]
@@ -37,22 +38,12 @@ public class ItemController(ItemRepository itemRepository,
     {
         var (acceptedItems, redirectedItems) = SplitItems(items, "Checking item for order");
         var getTask = _itemRepository.GetItemsForOrderAsync(acceptedItems);
-        var redirectTasks = RedirectItems(redirectedItems, "get-items");
-        await Task.WhenAll(Task.WhenAll(redirectTasks), getTask);
+        var redirectTask = RedirectItems(redirectedItems, "get-items");
+        await Task.WhenAll(redirectTask, getTask);
 
-        var dbItems = getTask.Result;
-
-        using (var activity = _activitySource.StartActivity("Merge order results"))
-        {
-            foreach (var response in redirectTasks)
-            {
-                var retrievedItems = await response.Result.Content.ReadFromJsonAsync<List<Item>>();
-                if (retrievedItems is not null)
-                {
-                    dbItems.AddRange(retrievedItems);
-                }
-            }
-        }
+        var dbItems = await getTask;
+        var retrievedItems = await redirectTask;
+        dbItems.AddRange(retrievedItems);
 
         return dbItems;
     }
@@ -79,10 +70,9 @@ public class ItemController(ItemRepository itemRepository,
         return redirectIndex == _config.ServiceIndex ? (redirectIndex + 1) % _config.WarehouseCount : redirectIndex;
     }
 
-    private List<Task<HttpResponseMessage>> RedirectItems(List<Item> items, string operation)
+    private async Task<IEnumerable<Item>> RedirectItems(List<Item> items, string operation)
     {
-        List<Task<HttpResponseMessage>> responses = [];
-
+        List<Item> result = [];
         var redirections = items
             .GroupBy(item => GetRedirectionIndex())
             .Where(g => g.Any())
@@ -93,11 +83,24 @@ public class ItemController(ItemRepository itemRepository,
             var redirectUrl = _config.RedirectionUrls[redirectIndex];
             _logger.LogWarning("Redirecting {Count} items to WarehouseService-{RedirectIndex} for operation {Operation}", redirectedItems.Count, redirectIndex, operation);
 
-            responses.Add(_httpClient.PostAsJsonAsync($"{redirectUrl}/item/{operation}", redirectedItems)
-                .ContinueWith(t => t.Result.EnsureSuccessStatusCode()));
+            var response = await _httpClient.PostAsJsonAsync($"{redirectUrl}/item/{operation}", redirectedItems);
+            response.EnsureSuccessStatusCode();
+            var stringContent = await response.Content.ReadAsStringAsync();
+
+            if (string.IsNullOrWhiteSpace(stringContent))
+            {
+                continue;
+            }
+
+            var retrievedItems = JsonSerializer.Deserialize<List<Item>>(stringContent);
+
+            if (retrievedItems is not null)
+            {
+                result.AddRange(retrievedItems);
+            }
         }
 
-        return responses;
+        return result;
     }
 
     private (List<Item>, List<Item>) SplitItems(IEnumerable<Item> items, string operation)
