@@ -8,8 +8,8 @@ do
     then
         name=${BASH_REMATCH[1]}
         version=${BASH_REMATCH[2]}
-        echo "Updating $name version $version in project $proj to latest"
-        dotnet add $proj package $name
+        echo "Updating $name version $version in project $proj to latest. Adding args from script input: $@"
+        dotnet add $proj package $name $@
     fi
   done < $proj
 done
