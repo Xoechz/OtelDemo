@@ -112,6 +112,7 @@ public class ItemController(ItemRepository itemRepository,
 
         foreach (var item in items.Deduplicate())
         {
+            using var activity = _activitySource.StartEntityActivity(operation, item.ArticleName);
             if (_rand.NextDouble() < 0.5)
             {
                 _instruments.ItemsProcessedCounter.Add(1, new("operation", operation), new("outcome", "redirected"));
@@ -119,7 +120,6 @@ public class ItemController(ItemRepository itemRepository,
             }
             else
             {
-                using var activity = _activitySource.StartEntityActivity(operation, item.ArticleName);
                 activity?.SetTag("item.amount", item.Stock);
 
                 var failure = _failureFaker.Generate();

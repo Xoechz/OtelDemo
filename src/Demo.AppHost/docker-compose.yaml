@@ -1,7 +1,7 @@
 # Due to me unable to reach the aspire dashboard from a container started by aspire, a docker-compose file is used.
 services:
   dito:
-    image: xoechz/dito:latest
+    image: xoechz/dito:0.143.0
     volumes:
       - ./collector-config-demo.yaml:/etc/dito/config.yaml
     command: ["--config", "/etc/dito/config.yaml"]
