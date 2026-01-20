@@ -8,18 +8,53 @@ public class ItemFaker : Faker<Item>
 
     public ItemFaker(int seed)
     {
-        ConfigureOrderFaker(seed);
+        ConfigureItemFaker(seed);
     }
 
     #endregion 
 
     #region private methods
 
-    private void ConfigureOrderFaker(int seed)
+    private void ConfigureItemFaker(int seed)
     {
         UseSeed(seed)
-            .CustomInstantiator(f => new(f.Commerce.Product(), f.Random.Int(1, 20)));
+            .CustomInstantiator(f => new(f.PickRandom(_itemNames), f.Random.Int(1, 20)));
     }
+
+    private static readonly string[] _itemNames =
+    [
+        "Laptop",
+        "Smartphone",
+        "Headphones",
+        "Monitor",
+        "Keyboard",
+        "Mouse",
+        "Printer",
+        "Tablet",
+        "Camera",
+        "Smartwatch",
+        "Speaker",
+        "Router",
+        "External Hard Drive",
+        "Webcam",
+        "Microphone",
+        "Charger",
+        "USB Flash Drive",
+        "Graphics Card",
+        "Motherboard",
+        "Power Supply",
+        "Cooling Fan",
+        "VR Headset",
+        "Gaming Console",
+        "E-reader",
+        "Projector",
+        "Smart Home Hub",
+        "Fitness Tracker",
+        "Drone",
+        "3D Printer",
+        "Action Camera",
+        "Smart Light Bulb"
+    ];
 
     #endregion 
 }
